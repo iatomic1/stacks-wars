@@ -12,6 +12,7 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 import siteConfig from "@/config/site";
+import ConnectWallet from "./connect-wallet";
 
 export default function SiteHeader() {
   const pathname = usePathname();
@@ -55,6 +56,8 @@ export default function SiteHeader() {
         </nav>
 
         <div className="flex items-center md:hidden gap-4">
+          <ConnectWallet />
+
           <Sheet>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" size="icon">
@@ -82,6 +85,9 @@ export default function SiteHeader() {
               </nav>
             </SheetContent>
           </Sheet>
+        </div>
+        <div className="hidden md:flex">
+          <ConnectWallet />
         </div>
       </div>
     </header>
