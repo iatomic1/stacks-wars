@@ -15,13 +15,16 @@ import {
   Users,
   Trophy,
   Gamepad2,
+  Loader,
   Info,
   Medal,
   User,
   ChevronRight,
 } from "lucide-react";
 import { getPoolById } from "@/lib/services/pools";
+import JoinPoolForm from "./_components/join-pool-form";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function PoolDetailPage({
   params,
@@ -297,10 +300,21 @@ export default async function PoolDetailPage({
               </Card>
             </div>
 
-            {/* Sidebar */}
             <div className="space-y-4 sm:space-y-6">
-              {/* Join Pool Form */}
               <div className="lg:sticky lg:top-6 flex flex-col gap-4">
+                <Suspense
+                  fallback={
+                    <div className="flex justify-center items-center py-6 sm:py-8">
+                      <Loader className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-muted-foreground" />
+                    </div>
+                  }
+                >
+                  <JoinPoolForm
+                    amount={Number.parseFloat(pool.amount) / pool.maxPlayers}
+                    pool={pool}
+                  />
+                </Suspense>
+
                 <Card className="overflow-hidden">
                   <CardHeader className="p-4 pb-2 sm:p-6 sm:pb-3">
                     <CardTitle className="text-sm sm:text-base">

@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,10 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/context/UserContext";
 import { joinPoolAction } from "@/lib/actions/pools";
-import { STX_TRANSFER_ADDRESS } from "@/lib/constants";
 import { Label } from "@radix-ui/react-label";
-import { request } from "@stacks/connect";
-import { Loader, Loader2, Lock } from "lucide-react";
+import { Loader2, Lock } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -24,11 +21,9 @@ import { useServerAction } from "zsa-react";
 export default function JoinPoolForm({
   amount,
   pool,
-  // poolId,
 }: {
   amount: number;
   pool: any;
-  // poolId: string;
 }) {
   const { user, loading: userLoading } = useUser();
   const router = useRouter(); // Properly initialize router
