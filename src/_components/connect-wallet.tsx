@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@/context/UserContext";
 import { useWallet } from "@/context/WalletContext";
 import { truncateAddress } from "@/lib/utils";
 import { Loader, Wallet2 } from "lucide-react";
