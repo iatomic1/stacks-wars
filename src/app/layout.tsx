@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import SiteFooter from "@/_components/site-footer";
 import SiteHeader from "@/_components/site-header";
+import { WalletProvider } from "@/context/WalletContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +31,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased mx-auto`}
       >
-        <SiteHeader />
-        <Toaster richColors position="top-right" />
-        {children}
-        <SiteFooter />
+        <WalletProvider>
+          <SiteHeader />
+          <Toaster richColors position="top-right" />
+          {children}
+          <SiteFooter />
+        </WalletProvider>
       </body>
     </html>
   );
