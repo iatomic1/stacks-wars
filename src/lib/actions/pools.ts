@@ -5,6 +5,7 @@ import {
   joinPool,
   getAllPools,
   getPoolById,
+  updatePoolStatus,
 } from "../services/pools";
 import { createServerAction } from "zsa";
 import { insertPoolSchema } from "../db/schema/pools";
@@ -13,9 +14,37 @@ import { z } from "zod";
 export const createPoolAction = createServerAction()
   .input(insertPoolSchema)
   .handler(async ({ input }) => {
+    console.log("input received", input);
     try {
       const pool = await createPool(input);
       revalidatePath("/pools");
+      return { success: true, data: pool };
+    } catch (error) {
+      console.error("Error creating pool:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to create pool",
+      };
+    }
+  });
+
+export const updatePoolStatusAction = createServerAction()
+  .input(
+    z.object({
+      poolId: z.string(),
+      status: z.string(),
+      initializeTxId: z.string(),
+    }),
+  )
+  .handler(async ({ input }) => {
+    try {
+      const pool = await updatePoolStatus(
+        input.poolId,
+        input.status,
+        input.initializeTxId,
+      );
+      revalidatePath("/pools");
+      revalidatePath(`/pools/${input.poolId}`);
       return { success: true, data: pool };
     } catch (error) {
       console.error("Error creating pool:", error);
@@ -31,6 +60,7 @@ export const joinPoolAction = createServerAction()
     z.object({
       poolId: z.string(),
       userId: z.string(),
+      txId: z.string(),
     }),
   )
   .handler(async ({ input }) => {

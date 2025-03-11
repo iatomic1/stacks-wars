@@ -1,4 +1,5 @@
 import Link from "next/link";
+import slugify from "react-slugify";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,9 @@ import { getPoolById } from "@/lib/services/pools";
 import JoinPoolForm from "./_components/join-pool-form";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import getTransaction from "@/lib/services/transactions";
+import { EXPLORER_BASE_URL } from "@/lib/constants";
+import InitialisePool from "./_components/initialise-pool";
 
 export default async function PoolDetailPage({
   params,
@@ -33,6 +37,8 @@ export default async function PoolDetailPage({
 }) {
   const poolId = (await params).id;
   const pool = await getPoolById(poolId);
+  const deployTx = await getTransaction(pool?.deployTxId);
+  const initializeTx = await getTransaction(pool?.initializeTxId);
 
   if (!pool) {
     notFound();
@@ -60,12 +66,17 @@ export default async function PoolDetailPage({
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight break-words">
                 {pool.name}
               </h1>
-              <Badge
-                variant={pool.status === "open" ? "default" : "secondary"}
-                className="px-2 py-0.5 sm:px-3 sm:py-1 text-xs sm:text-sm font-medium mt-1"
-              >
-                {pool.status === "open" ? "Open for Entry" : "Pool Full"}
-              </Badge>
+              {deployTx?.tx_status === "success" &&
+                initializeTx?.tx_status !== "success" && (
+                  <InitialisePool
+                    poolCreatorAddress={pool.creator.stxAddress}
+                    txSenderAddress={deployTx?.sender_address as string}
+                    poolName={pool.name}
+                    maxPlayers={pool.maxPlayers}
+                    totalPrize={Number.parseFloat(pool.amount)}
+                    poolId={pool.id}
+                  />
+                )}
             </div>
             <p className="text-sm sm:text-base text-muted-foreground max-w-3xl break-words">
               {pool.description}
@@ -163,14 +174,28 @@ export default async function PoolDetailPage({
                         Created by
                       </h3>
                       <div className="flex justify-between items-center p-2 sm:p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                            </div>
+                            <div className="overflow-hidden">
+                              <p className="text-sm sm:text-base font-medium truncate max-w-[120px] xs:max-w-[160px] sm:max-w-[200px] md:max-w-[300px]">
+                                {pool.creator.stxAddress}
+                              </p>
+                            </div>
                           </div>
-                          <div className="overflow-hidden">
-                            <p className="text-sm sm:text-base font-medium truncate max-w-[120px] xs:max-w-[160px] sm:max-w-[200px] md:max-w-[300px]">
-                              {pool.creator.stxAddress}
-                            </p>
+                          <div>
+                            <Button variant={"link"} asChild>
+                              <a
+                                href={`${EXPLORER_BASE_URL}txid/${deployTx?.tx_status === "success" ? pool.creator.stxAddress + "." + slugify(pool.name) + "-stacks-wars" : pool.txID}`}
+                                target="_blank"
+                              >
+                                {deployTx?.tx_status === "success"
+                                  ? "View Contract"
+                                  : "TX ID"}
+                              </a>
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -179,72 +204,72 @@ export default async function PoolDetailPage({
                 </CardContent>
               </Card>
 
-              <Card className="overflow-hidden">
-                <CardHeader className="bg-muted/30 p-4 pb-3 sm:p-6 sm:pb-4">
-                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                    <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                    Prize Distribution
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6">
-                  <div className="space-y-3 sm:space-y-4">
-                    {pool.prizeDistributions.map((prize) => {
-                      const medalColors = {
-                        1: "text-yellow-500",
-                        2: "text-slate-400",
-                        3: "text-amber-700",
-                      };
-
-                      const bgColors = {
-                        1: "bg-yellow-500/10",
-                        2: "bg-slate-400/10",
-                        3: "bg-amber-700/10",
-                      };
-
-                      return (
-                        <div
-                          key={prize.position}
-                          className="flex justify-between items-center p-3 sm:p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <div
-                              className={`flex h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full ${bgColors[prize.position as 1 | 2 | 3]}`}
-                            >
-                              <Medal
-                                className={`h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 ${medalColors[prize.position as 1 | 2 | 3]}`}
-                              />
-                            </div>
-                            <div>
-                              <p className="text-sm sm:text-base font-medium">
-                                {prize.position === 1
-                                  ? "1st Place"
-                                  : prize.position === 2
-                                    ? "2nd Place"
-                                    : "3rd Place"}
-                              </p>
-                              <p className="text-xs sm:text-sm text-muted-foreground">
-                                {(
-                                  (Number(pool.amount) * prize.percentage) /
-                                  100
-                                ).toFixed(2)}{" "}
-                                STX
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-lg sm:text-xl font-bold">
-                              {prize.percentage}%
-                            </span>
-                            <p className="text-xs text-muted-foreground">
-                              of pool
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* <Card className="overflow-hidden"> */}
+              {/*   <CardHeader className="bg-muted/30 p-4 pb-3 sm:p-6 sm:pb-4"> */}
+              {/*     <CardTitle className="flex items-center gap-2 text-base sm:text-lg"> */}
+              {/*       <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" /> */}
+              {/*       Prize Distribution */}
+              {/*     </CardTitle> */}
+              {/*   </CardHeader> */}
+              {/*   <CardContent className="p-4 sm:p-6"> */}
+              {/*     <div className="space-y-3 sm:space-y-4"> */}
+              {/*       {pool.prizeDistributions.map((prize) => { */}
+              {/*         const medalColors = { */}
+              {/*           1: "text-yellow-500", */}
+              {/*           2: "text-slate-400", */}
+              {/*           3: "text-amber-700", */}
+              {/*         }; */}
+              {/**/}
+              {/*         const bgColors = { */}
+              {/*           1: "bg-yellow-500/10", */}
+              {/*           2: "bg-slate-400/10", */}
+              {/*           3: "bg-amber-700/10", */}
+              {/*         }; */}
+              {/**/}
+              {/*         return ( */}
+              {/*           <div */}
+              {/*             key={prize.position} */}
+              {/*             className="flex justify-between items-center p-3 sm:p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors" */}
+              {/*           > */}
+              {/*             <div className="flex items-center gap-2 sm:gap-3"> */}
+              {/*               <div */}
+              {/*                 className={`flex h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 items-center justify-center rounded-full ${bgColors[prize.position as 1 | 2 | 3]}`} */}
+              {/*               > */}
+              {/*                 <Medal */}
+              {/*                   className={`h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 ${medalColors[prize.position as 1 | 2 | 3]}`} */}
+              {/*                 /> */}
+              {/*               </div> */}
+              {/*               <div> */}
+              {/*                 <p className="text-sm sm:text-base font-medium"> */}
+              {/*                   {prize.position === 1 */}
+              {/*                     ? "1st Place" */}
+              {/*                     : prize.position === 2 */}
+              {/*                       ? "2nd Place" */}
+              {/*                       : "3rd Place"} */}
+              {/*                 </p> */}
+              {/*                 <p className="text-xs sm:text-sm text-muted-foreground"> */}
+              {/*                   {( */}
+              {/*                     (Number(pool.amount) * prize.percentage) / */}
+              {/*                     100 */}
+              {/*                   ).toFixed(2)}{" "} */}
+              {/*                   STX */}
+              {/*                 </p> */}
+              {/*               </div> */}
+              {/*             </div> */}
+              {/*             <div className="text-right"> */}
+              {/*               <span className="text-lg sm:text-xl font-bold"> */}
+              {/*                 {prize.percentage}% */}
+              {/*               </span> */}
+              {/*               <p className="text-xs text-muted-foreground"> */}
+              {/*                 of pool */}
+              {/*               </p> */}
+              {/*             </div> */}
+              {/*           </div> */}
+              {/*         ); */}
+              {/*       })} */}
+              {/*     </div> */}
+              {/*   </CardContent> */}
+              {/* </Card> */}
 
               <Card className="overflow-hidden">
                 <CardHeader className="bg-muted/30 p-4 pb-3 sm:p-6 sm:pb-4">
@@ -274,10 +299,22 @@ export default async function PoolDetailPage({
                               </p>
                             </div>
                           </div>
-                          <div className="text-right">
+                          <div className="text-right flex flex-col">
                             <span className="text-sm sm:text-base font-bold">
                               {participant.amount} STX
                             </span>
+                            <Button
+                              variant={"link"}
+                              asChild
+                              className="!p-0 text-right"
+                            >
+                              <a
+                                href={`${EXPLORER_BASE_URL}txid/${participant.txId}`}
+                                target="_blank"
+                              >
+                                Explorer
+                              </a>
+                            </Button>
                           </div>
                         </div>
                       ))}
@@ -312,6 +349,7 @@ export default async function PoolDetailPage({
                   <JoinPoolForm
                     amount={Number.parseFloat(pool.amount) / pool.maxPlayers}
                     pool={pool}
+                    initializeTx={initializeTx}
                   />
                 </Suspense>
 

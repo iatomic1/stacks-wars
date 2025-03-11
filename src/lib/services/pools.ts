@@ -143,56 +143,78 @@ export async function getAllPools(filters?: {
 }
 
 export async function createPool(data: NewPoolWithDistribution): Promise<Pool> {
-  // Start a transaction
-  const result = await db.transaction(async (tx) => {
-    // Create the pool with proper type handling
-    const newPool = await tx
-      .insert(pools)
-      .values({
-        name: data.name,
-        creatorId: data.creatorId,
-        gameId: data.gameId,
-        amount: data.amount,
-        currentAmount: "0", // Initialize with zero
-        maxPlayers: Number(data.maxPlayers),
-        stxAddress: data.stxAddress,
-        startTime: data.startTime || new Date(Date.now() + 24 * 60 * 60 * 1000),
-        description: data.description || "",
-        status: "open",
-      })
-      .returning();
+  try {
+    const result = await db.transaction(async (tx) => {
+      try {
+        const newPool = await tx
+          .insert(pools)
+          .values({
+            ...data,
+            currentAmount: "0",
+            maxPlayers: Number(data.maxPlayers),
+            startTime:
+              data.startTime || new Date(Date.now() + 24 * 60 * 60 * 1000),
+            description: data.description || "",
+            status: "open",
+          })
+          .returning();
 
-    const poolId = newPool[0].id;
+        if (!newPool.length) {
+          throw new Error("Failed to create pool: No pool was inserted.");
+        }
 
-    // Add prize distribution if provided, otherwise use default
-    const distributions = data.prizeDistribution || [
-      { position: 1, percentage: 50 },
-      { position: 2, percentage: 30 },
-      { position: 3, percentage: 20 },
-    ];
+        const poolId = newPool[0].id;
 
-    // Insert prize distributions with proper typing
-    await tx.insert(prizeDistributions).values(
-      distributions.map((dist: PrizeDistribution) => ({
-        poolId,
-        position: dist.position,
-        percentage: dist.percentage,
-      })),
+        // Add prize distribution if provided, otherwise use default
+        const distributions = data.prizeDistribution || [
+          { position: 1, percentage: 50 },
+          { position: 2, percentage: 30 },
+          { position: 3, percentage: 20 },
+        ];
+
+        if (!distributions.length) {
+          throw new Error(
+            "Invalid prize distribution: No distributions provided.",
+          );
+        }
+
+        // Insert prize distributions with proper typing
+        await tx.insert(prizeDistributions).values(
+          distributions.map((dist: PrizeDistribution) => ({
+            poolId,
+            position: dist.position,
+            percentage: dist.percentage,
+          })),
+        );
+
+        return newPool[0];
+      } catch (error) {
+        console.error("Transaction failed:", error);
+        throw new Error("Transaction error: Pool creation failed.");
+      }
+    });
+
+    if (!result) {
+      throw new Error("Pool creation failed: No result returned.");
+    }
+
+    if (result.gameId) {
+      await updateGameStats(result.gameId);
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error in createPool:", error);
+    throw new Error(
+      error instanceof Error ? error.message : "Unknown error occurred.",
     );
-
-    return newPool[0];
-  });
-
-  if (result.gameId) {
-    await updateGameStats(result.gameId);
   }
-
-  return result;
 }
 
 export async function joinPool(data: {
   poolId: string;
   userId: string;
+  txId: string;
 }): Promise<Participant> {
   const pool = await getPoolById(data.poolId);
 
@@ -200,9 +222,9 @@ export async function joinPool(data: {
     throw new Error("Pool not found");
   }
 
-  if (pool.status !== "open") {
-    throw new Error("Pool is not open for joining");
-  }
+  // if (pool.status !== "open") {
+  //   throw new Error("Pool is not open for joining");
+  // }
 
   const participantsCount = await db
     .select({ count: count() })
@@ -241,6 +263,7 @@ export async function joinPool(data: {
       userId: data.userId,
       poolId: data.poolId,
       amount: entryAmount,
+      txId: data.txId,
     })
     .returning();
 
@@ -269,6 +292,7 @@ export async function joinPool(data: {
 export async function updatePoolStatus(
   id: string,
   status: string,
+  initializeTxId: string,
 ): Promise<Pool> {
   try {
     const pool = await getPoolById(id);
@@ -278,13 +302,9 @@ export async function updatePoolStatus(
 
     const updatedPool = await db
       .update(pools)
-      .set({ status })
+      .set({ status, initializeTxId: initializeTxId })
       .where(eq(pools.id, id))
       .returning();
-
-    if (pool.gameId) {
-      await updateGameStats(pool.gameId);
-    }
 
     return updatedPool[0];
   } catch (err) {

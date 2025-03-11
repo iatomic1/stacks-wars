@@ -1,4 +1,5 @@
 "use client";
+import { Pc } from "@stacks/transactions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,31 +11,38 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/context/UserContext";
+import { userSession, useWallet } from "@/context/WalletContext";
 import { joinPoolAction } from "@/lib/actions/pools";
+import { POOL_SUFFIX, EXPLORER_BASE_URL } from "@/lib/constants";
+import { SmartContractTransaction } from "@/types/transaction";
 import { Label } from "@radix-ui/react-label";
+import { openContractCall } from "@stacks/connect";
 import { Loader2, Lock } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import slugify from "react-slugify";
 import { toast } from "sonner";
 import { useServerAction } from "zsa-react";
 
 export default function JoinPoolForm({
   amount,
   pool,
+  initializeTx,
 }: {
   amount: number;
   pool: any;
+  initializeTx: SmartContractTransaction;
 }) {
   const { user, loading: userLoading } = useUser();
+  const { address } = useWallet();
   const router = useRouter(); // Properly initialize router
 
-  // Determine if user can participate
   const canParticipate =
     user?.id &&
-    pool.status === "open" &&
     pool.participants.length < pool.maxPlayers &&
     !pool.participants.some((participant) => participant.userId === user.id);
-
+  const [isLoading, setIsLoading] = useState(false);
   const { data, execute, isPending } = useServerAction(joinPoolAction, {
     onSuccess(result) {
       if (result.data.success) {
@@ -46,25 +54,66 @@ export default function JoinPoolForm({
     },
   });
   const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (!user?.id) {
       toast.error("Authentication required", {
         description: "Please connect wallet to join this pool",
       });
+      return; // Add this return to prevent further execution
     }
 
-    e.preventDefault();
     try {
-      // const response = await request("stx_transferStx", {
-      //   amount: amount * 1_000_000,
-      //   recipient: STX_TRANSFER_ADDRESS,
-      //   network: "mainnet",
-      // });
-      await execute({
-        poolId: pool.id,
-        userId: user?.id as string,
+      setIsLoading(true);
+
+      await openContractCall({
+        network: "mainnet",
+        userSession: userSession,
+        contractAddress: `${pool.creator.stxAddress}`,
+        contractName: `${slugify(pool.name)}${POOL_SUFFIX}`,
+        functionName: "join-pool",
+        functionArgs: [],
+        postConditions: [
+          Pc.principal(address as string)
+            .willSendEq(Math.floor(amount * 1_000_000))
+            .ustx(),
+        ],
+        onFinish: async (response) => {
+          if (!response.txId) {
+            console.log(response);
+            throw new Error("Error calling contract function");
+          }
+
+          await execute({
+            poolId: pool.id,
+            userId: user?.id as string,
+            txId: response.txId,
+          });
+
+          toast("Successfully joined pool", {
+            description: `Transaction ID: ${response.txId}`,
+            action: {
+              label: "Explorer",
+              onClick: () => {
+                window.location.href = `${EXPLORER_BASE_URL}txid/${response.txId}`;
+              },
+            },
+          });
+          setIsLoading(false);
+        },
+        onCancel: () => {
+          setIsLoading(false);
+          toast("Failed to join pool", {
+            description: "User cancelled transaction",
+          });
+        },
       });
     } catch (err) {
       console.error(err);
+      setIsLoading(false);
+      toast.error("Failed to join pool", {
+        description: "An error occurred while joining the pool",
+      });
     }
   };
 
@@ -97,7 +146,13 @@ export default function JoinPoolForm({
             <Button
               type="submit"
               className="w-full"
-              disabled={userLoading || isPending || !canParticipate}
+              disabled={
+                userLoading ||
+                isPending ||
+                !user?.id ||
+                initializeTx.tx_status !== "success" ||
+                !canParticipate
+              }
             >
               {isPending ? (
                 <>
@@ -114,14 +169,12 @@ export default function JoinPoolForm({
                   <Lock className="mr-2 h-4 w-4" />
                   Connect Wallet to Join
                 </>
-              ) : !canParticipate ? (
-                pool?.participants.some((p) => p.userId === user.id) ? (
-                  "Already Joined"
-                ) : pool.status !== "open" ? (
-                  "Pool Not Open"
-                ) : (
-                  "Pool Full"
-                )
+              ) : initializeTx.tx_status !== "success" ? (
+                "Pool Not Initialized"
+              ) : pool?.participants.some((p) => p.userId === user.id) ? (
+                "Already Joined"
+              ) : pool.participants.length >= pool.maxPlayers ? (
+                "Pool Full"
               ) : (
                 "Join Pool"
               )}

@@ -24,7 +24,7 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const { connected, addresses } = useWallet();
+  const { connected, address } = useWallet();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -59,18 +59,18 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   };
 
   const refetchUser = async (): Promise<void> => {
-    if (addresses?.stx?.[0]?.address) {
-      await fetchOrCreateUser(addresses.stx[0].address);
+    if (address) {
+      await fetchOrCreateUser(address);
     }
   };
 
   useEffect(() => {
-    if (connected && addresses?.stx?.[0]?.address) {
-      fetchOrCreateUser(addresses.stx[0].address);
+    if (connected && address) {
+      fetchOrCreateUser(address);
     } else if (!connected) {
       setUser(null);
     }
-  }, [connected, addresses]);
+  }, [connected, address]);
 
   const value: UserContextType = {
     user,

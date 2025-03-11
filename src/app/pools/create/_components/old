@@ -1,5 +1,5 @@
+
 "use client";
-import slugify from "react-slugify";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,7 +31,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import type { Game } from "@/lib/services/games";
+import { Game } from "@/lib/services/games";
 import { insertPoolSchema } from "@/lib/db/schema/pools";
 import { Slider } from "@/components/ui/slider";
 import { useServerAction } from "zsa-react";
@@ -39,14 +39,8 @@ import { createPoolAction } from "@/lib/actions/pools";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import { useUser } from "@/context/UserContext";
-import { clarityCode } from "@/lib/pool-clarity-code";
-import { openContractDeploy } from "@stacks/connect";
-import { userSession } from "@/context/WalletContext";
 
-// Extend the schema to make description required and handle the decimal type for amount
-const formSchema = insertPoolSchema.extend({
-  description: z.string().min(1, "Description is required"),
-});
+const formSchema = insertPoolSchema;
 
 export default function CreatePoolForm({ games }: { games: Game[] }) {
   const router = useRouter();
@@ -62,12 +56,6 @@ export default function CreatePoolForm({ games }: { games: Game[] }) {
         router.push(`/pools/${data.id}`);
       }
     },
-    onError(error) {
-      console.error("Server action error:", error);
-      toast("Failed to create pool", {
-        description: error.message || "An unexpected error occurred",
-      });
-    },
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -75,58 +63,33 @@ export default function CreatePoolForm({ games }: { games: Game[] }) {
     defaultValues: {
       gameId: games.length > 0 ? games[0].id : "",
       maxPlayers: 4,
-      status: "deploying",
+      status: "open",
       startTime: new Date(),
-      description: "",
-      amount: undefined,
-      name: "",
-      txID: "",
     },
-    mode: "onChange",
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("Form submitted with values:", values);
     try {
       console.log("Form submitted with values:", values);
+      // const response = await request("stx_deployContract", {
+      //   name: slugify(values.name) + "-stacks-wars",
+      //   clarityCode: clarityCode,
+      //   network: "mainnet",
+      // });
+      //
+      // if (!response.txid) {
+      //   console.log(response);
+      //   throw new Error("Error deploying contract");
+      // }
 
-      // Make sure all required fields are present
-      if (!user?.id) {
-        toast("User not authenticated", {
-          description: "You must be logged in to create a pool",
-        });
-        return;
-      }
-      await openContractDeploy({
-        network: "mainnet",
-        userSession: userSession,
-        contractName: slugify(values.name) + "-stacks-wars",
-        codeBody: clarityCode,
-        onFinish: async (response) => {
-          if (!response.txId) {
-            console.log(response);
-            throw new Error("Error deploying contract");
-          }
-
-          await execute({
-            ...values,
-            creatorId: user.id,
-            txID: response.txId,
-          });
-        },
-        onCancel: () => {
-          toast("Failed to create pool", {
-            description: "User cancelled transaction",
-          });
-        },
-      });
+      // await execute({
+      //   ...values,
+      //   creatorId: user?.id,
+      //   txID: response.txid,
+      // });
     } catch (error) {
       console.error("Error creating pool:", error);
-      toast("Failed to create pool", {
-        description:
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred",
-      });
     }
   }
 
@@ -169,13 +132,6 @@ export default function CreatePoolForm({ games }: { games: Game[] }) {
                       type="number"
                       placeholder="Enter amount in STX"
                       {...field}
-                      // onChange={(e) => {
-                      //   const value =
-                      //     e.target.value === ""
-                      //       ? undefined
-                      //       : Number.parseFloat(e.target.value);
-                      //   field.onChange(value);
-                      // }}
                     />
                   </FormControl>
                   <FormDescription>
@@ -268,17 +224,18 @@ export default function CreatePoolForm({ games }: { games: Game[] }) {
               value={new Date().toISOString()}
             />
 
+            <input type="hidden" {...form.register("status")} value="open" />
             <input
               type="hidden"
-              {...form.register("status")}
-              value="deploying"
+              {...form.register("creatorId")}
+              value={user?.id}
             />
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button variant="outline" asChild>
               <Link href="/pools">Cancel</Link>
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending} variant={"secondary"}>
               {isPending && (
                 <Loader className="h-4 w-4 mr-1 animate-spin" size={17} />
               )}

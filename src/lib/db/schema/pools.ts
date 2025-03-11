@@ -21,7 +21,10 @@ export const pools = pgTable("pools", {
   currentAmount: decimal().default("0"),
   amount: decimal().notNull(),
   maxPlayers: integer().notNull(),
-  status: varchar().default("open"),
+  contractId: text(),
+  deployTxId: text().notNull(),
+  initializeTxId: text(),
+  status: varchar().default("deploying"),
   startTime: timestamp().notNull(),
   description: text().notNull(),
 });

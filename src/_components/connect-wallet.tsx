@@ -5,7 +5,7 @@ import { truncateAddress } from "@/lib/utils";
 import { Loader, Wallet2 } from "lucide-react";
 
 export default function ConnectWallet() {
-  const { connected, connectWallet, disconnectWallet, loading, addresses } =
+  const { connected, connectWallet, disconnectWallet, loading, address } =
     useWallet();
 
   return (
@@ -22,9 +22,7 @@ export default function ConnectWallet() {
       ) : (
         <div className="flex items-center gap-2">
           <span className="hidden md:inline text-xs text-muted-foreground font-medium">
-            {addresses?.stx?.[0]
-              ? truncateAddress(addresses.stx[0].address)
-              : ""}
+            {address && truncateAddress(address)}
           </span>
           <Button onClick={disconnectWallet} variant="outline" size="sm">
             Disconnect

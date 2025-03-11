@@ -6,26 +6,16 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import {
-  connect,
-  disconnect,
-  isConnected,
-  getLocalStorage,
-  StorageData,
-} from "@stacks/connect";
+import { showConnect } from "@stacks/connect";
+import { AppConfig, UserSession } from "@stacks/connect";
 
-type Address = {
-  address: string;
-};
-
-type Addresses = {
-  stx: Address[];
-  btc: Address[];
-};
+// Create the AppConfig and UserSession
+const appConfig = new AppConfig(["store_write", "publish_data"]);
+export const userSession = new UserSession({ appConfig });
 
 interface WalletContextType {
   connected: boolean;
-  addresses: Addresses | null;
+  address: string | null;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   loading: boolean;
@@ -36,24 +26,60 @@ const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 interface WalletProviderProps {
   children: ReactNode;
+  appName?: string;
+  appIconUrl?: string;
 }
 
-export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
+export const WalletProvider: React.FC<WalletProviderProps> = ({
+  children,
+  appName = "My Stacks App",
+  appIconUrl = "/logo.png",
+}) => {
   const [connected, setConnected] = useState<boolean>(false);
-  const [addresses, setAddresses] = useState<Addresses | null>(null);
+  const [address, setAddress] = useState<string | null>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const checkConnection = () => {
-      const connectionStatus = isConnected();
-      setConnected(connectionStatus);
+      try {
+        // Try to check if user is signed in
+        const isSignedIn = userSession.isUserSignedIn();
+        setConnected(isSignedIn);
 
-      if (connectionStatus) {
-        const localData = getLocalStorage() as StorageData;
-        if (localData && localData.addresses) {
-          setAddresses(localData.addresses);
+        if (isSignedIn) {
+          try {
+            const userData = userSession.loadUserData();
+            console.log(userData);
+            if (userData.profile && userData.profile.stxAddress) {
+              setAddress(
+                userData.profile.stxAddress.mainnet ||
+                  userData.profile.stxAddress.testnet,
+              );
+            }
+          } catch (err) {
+            console.warn("Error loading user data:", err);
+            // Clear potentially corrupted session data
+            userSession.signUserOut();
+            setConnected(false);
+          }
         }
+      } catch (err) {
+        console.warn("Error checking session state:", err);
+        // Clear potentially corrupted session data
+        try {
+          userSession.signUserOut();
+        } catch (clearErr) {
+          console.error("Failed to clear session:", clearErr);
+          // Last resort - try to clear localStorage directly
+          try {
+            localStorage.removeItem("blockstack-session");
+            localStorage.removeItem("blockstack-gaia-hub-config");
+          } catch (localStorageErr) {
+            console.error("Failed to clear localStorage:", localStorageErr);
+          }
+        }
+        setConnected(false);
       }
     };
 
@@ -65,38 +91,64 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      await connect();
-
-      const localData = getLocalStorage() as StorageData;
-
-      if (localData && localData.addresses) {
-        setAddresses(localData.addresses);
-      }
-
-      setConnected(true);
+      showConnect({
+        userSession,
+        appDetails: {
+          name: appName,
+          icon: appIconUrl,
+        },
+        onFinish: () => {
+          try {
+            const userData = userSession.loadUserData();
+            if (userData.profile && userData.profile.stxAddress) {
+              setAddress(
+                userData.profile.stxAddress.mainnet ||
+                  userData.profile.stxAddress.testnet,
+              );
+            }
+            setConnected(true);
+          } catch (err) {
+            console.error("Error loading user data after connect:", err);
+            setError(new Error("Failed to load user data after connection"));
+          } finally {
+            setLoading(false);
+          }
+        },
+        onCancel: () => {
+          setLoading(false);
+        },
+      });
     } catch (err) {
       setError(
         err instanceof Error ? err : new Error("Failed to connect wallet"),
       );
       console.error("Error connecting wallet:", err);
-    } finally {
       setLoading(false);
     }
   };
 
   const disconnectWallet = (): void => {
     try {
-      disconnect();
+      userSession.signUserOut();
       setConnected(false);
-      setAddresses(null);
+      setAddress(null);
     } catch (err) {
       console.error("Error disconnecting wallet:", err);
+      // If signUserOut fails, try direct localStorage removal
+      try {
+        localStorage.removeItem("blockstack-session");
+        localStorage.removeItem("blockstack-gaia-hub-config");
+        setConnected(false);
+        setAddress(null);
+      } catch (localStorageErr) {
+        console.error("Failed to clear localStorage:", localStorageErr);
+      }
     }
   };
 
   const value: WalletContextType = {
     connected,
-    addresses,
+    address: address,
     connectWallet,
     disconnectWallet,
     loading,
