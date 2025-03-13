@@ -10,12 +10,70 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Plus, Users } from "lucide-react";
-import { getAllPools } from "@/lib/services/pools";
+//import { getAllPools } from "@/lib/services/pools";
 import { truncateAddress } from "@/lib/utils";
 
 export default async function PoolsPage() {
-	const pools = await getAllPools();
-	console.log(pools);
+	//const pools = await getAllPools();
+	//console.log(pools);
+
+	const pools = [
+		{
+			id: 1,
+			name: "Tic Tac Toe",
+			status: "full",
+			amount: 100,
+			maxPlayers: 2,
+			participants: [
+				{
+					id: 1,
+					stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
+				},
+			],
+			creator: {
+				id: 1,
+				stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
+			},
+			game: { id: 1, name: "Tic Tac Toe" },
+		},
+		{
+			id: 1,
+			name: "Tic Tac Toe",
+			status: "open",
+			amount: 100,
+			maxPlayers: 2,
+			participants: [
+				{
+					id: 1,
+					stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
+				},
+			],
+			creator: {
+				id: 1,
+				stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
+			},
+			game: { id: 1, name: "Tic Tac Toe" },
+		},
+		{
+			id: 1,
+			name: "Tic Tac Toe",
+			status: "open",
+			amount: 100,
+			maxPlayers: 2,
+			participants: [
+				{
+					id: 1,
+					stxAddress:
+						"ST1PQHQKSP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00BV0Z1",
+				},
+			],
+			creator: {
+				id: 1,
+				stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
+			},
+			game: { id: 1, name: "Tic Tac Toe" },
+		},
+	];
 
 	return (
 		<div className="flex min-h-screen flex-col">
@@ -26,14 +84,14 @@ export default async function PoolsPage() {
 							<div>
 								<h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
 									{pools.length > 0
-										? "Available Pools"
-										: "No Pools Open"}
+										? "Active Lobbies"
+										: "There are no active lobbies"}
 								</h1>
 								<p className="mt-2 text-muted-foreground">
-									Join a pool to compete and win STX rewards
+									Join a lobby to Bettle
 								</p>
 							</div>
-							<Link href="/pools/create">
+							<Link href="/games">
 								<Button className="gap-1.5">
 									<Plus className="h-4 w-4" />
 									Create A Match
@@ -102,20 +160,27 @@ export default async function PoolsPage() {
 										</div>
 									</CardContent>
 									<CardFooter>
-										<Link
-											href={`/pools/${pool.id}`}
-											className="w-full"
+										<Button
+											asChild
+											variant={
+												pool.status === "open"
+													? "default"
+													: "outline"
+											}
+											className="w-full gap-1.5 cursor cursor-not-allowed"
+											disabled={pool.status !== "open"}
 										>
-											<Button
-												variant={
+											<Link
+												href={`${
 													pool.status === "open"
-														? "default"
-														: "secondary"
-												}
-												className="w-full gap-1.5"
-												disabled={
-													pool.status !== "open"
-												}
+														? `/lobby/${pool.id}`
+														: ""
+												}`}
+												className={`w-full ${
+													pool.status === "open"
+														? "cursor-pointer"
+														: "cursor-not-allowed"
+												}`}
 											>
 												{pool.status === "open"
 													? "Join Pool"
@@ -123,8 +188,8 @@ export default async function PoolsPage() {
 												{pool.status === "open" && (
 													<ArrowRight className="h-4 w-4" />
 												)}
-											</Button>
-										</Link>
+											</Link>
+										</Button>
 									</CardFooter>
 								</Card>
 							))}
