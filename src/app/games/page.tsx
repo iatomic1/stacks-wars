@@ -11,41 +11,41 @@ export interface Game {
 	image: string;
 }
 
+export const games: Game[] = [
+	{
+		id: 1,
+		name: "Tic Tac Toe",
+		description:
+			"Play Tic Tac Toe against other players and win STX rewards",
+		type: ["Multiplayer", "Strategy"],
+		totalPrize: 100,
+		activePools: 5,
+		image: "/placeholder.svg",
+	},
+	{
+		id: 2,
+		name: "Tic Tac Toe",
+		description:
+			"Play Tic Tac Toe against other players and win STX rewards",
+		type: ["Multiplayer", "Strategy"],
+		totalPrize: 100,
+		activePools: 5,
+		image: "/placeholder.svg",
+	},
+	{
+		id: 3,
+		name: "Tic Tac Toe",
+		description:
+			"Play Tic Tac Toe against other players and win STX rewards",
+		type: ["Multiplayer", "Strategy"],
+		totalPrize: 100,
+		activePools: 5,
+		image: "/placeholder.svg",
+	},
+];
+
 export default async function GamesPage() {
 	//const games = await getAllGames();
-
-	const games: Game[] = [
-		{
-			id: 1,
-			name: "Tic Tac Toe",
-			description:
-				"Play Tic Tac Toe against other players and win STX rewards",
-			type: ["Multiplayer", "Strategy"],
-			totalPrize: 100,
-			activePools: 5,
-			image: "/placeholder.svg",
-		},
-		{
-			id: 2,
-			name: "Tic Tac Toe",
-			description:
-				"Play Tic Tac Toe against other players and win STX rewards",
-			type: ["Multiplayer", "Strategy"],
-			totalPrize: 100,
-			activePools: 5,
-			image: "/placeholder.svg",
-		},
-		{
-			id: 3,
-			name: "Tic Tac Toe",
-			description:
-				"Play Tic Tac Toe against other players and win STX rewards",
-			type: ["Multiplayer", "Strategy"],
-			totalPrize: 100,
-			activePools: 5,
-			image: "/placeholder.svg",
-		},
-	];
 
 	return (
 		<div className="flex min-h-screen flex-col">
