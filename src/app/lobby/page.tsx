@@ -128,7 +128,7 @@ export default async function PoolsPage() {
 										<div className="grid gap-2">
 											<div className="flex justify-between">
 												<span className="text-muted-foreground">
-													Prize Pool:
+													Stakes:
 												</span>
 												<span className="font-medium">
 													{pool.amount} STX
