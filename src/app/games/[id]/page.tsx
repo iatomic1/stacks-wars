@@ -1,12 +1,7 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Gamepad2, Users, Trophy } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
 import { Game, games } from "../page";
@@ -16,16 +11,6 @@ import CreatePoolForm from "@/components/lobby/create-lobby-form";
 // Dummy pools data - in real app this would come from an API
 
 export default function CreateGame() {
-	async function createLobby(formData: FormData) {
-		"use server";
-
-		console.log(formData);
-
-		// Here you would typically make an API call to create the pool
-		// For now, we'll just redirect to a dummy lobby ID
-		redirect("/lobby/pool-123456");
-	}
-
 	const game: Game = games[0];
 
 	return (
