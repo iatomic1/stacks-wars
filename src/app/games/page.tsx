@@ -1,8 +1,8 @@
 //import { getAllGames } from "@/lib/services/games";
-import GameCard from "./_components/game-card";
+import GameCard from "@/components/games/game-card";
 
 export interface Game {
-	id: number;
+	id: string;
 	name: string;
 	description: string;
 	type: string[];
@@ -13,7 +13,7 @@ export interface Game {
 
 export const games: Game[] = [
 	{
-		id: 1,
+		id: "1",
 		name: "Lexi War",
 		description:
 			"Challenge players in our word-rule game and compete for STX rewards",
@@ -23,7 +23,7 @@ export const games: Game[] = [
 		image: "/placeholder.svg",
 	},
 	{
-		id: 2,
+		id: "2",
 		name: "Lexi War",
 		description:
 			"Challenge players in our word-rule game and compete for STX rewards",
@@ -33,7 +33,7 @@ export const games: Game[] = [
 		image: "/placeholder.svg",
 	},
 	{
-		id: 3,
+		id: "3",
 		name: "Lexi War",
 		description:
 			"Challenge players in our word-rule game and compete for STX rewards",
