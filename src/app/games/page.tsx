@@ -14,9 +14,9 @@ export interface Game {
 export const games: Game[] = [
 	{
 		id: 1,
-		name: "Tic Tac Toe",
+		name: "Lexi War",
 		description:
-			"Play Tic Tac Toe against other players and win STX rewards",
+			"Challenge players in our word-rule game and compete for STX rewards",
 		type: ["Multiplayer", "Strategy"],
 		totalPrize: 100,
 		activePools: 5,
@@ -24,9 +24,9 @@ export const games: Game[] = [
 	},
 	{
 		id: 2,
-		name: "Tic Tac Toe",
+		name: "Lexi War",
 		description:
-			"Play Tic Tac Toe against other players and win STX rewards",
+			"Challenge players in our word-rule game and compete for STX rewards",
 		type: ["Multiplayer", "Strategy"],
 		totalPrize: 100,
 		activePools: 5,
@@ -34,9 +34,9 @@ export const games: Game[] = [
 	},
 	{
 		id: 3,
-		name: "Tic Tac Toe",
+		name: "Lexi War",
 		description:
-			"Play Tic Tac Toe against other players and win STX rewards",
+			"Challenge players in our word-rule game and compete for STX rewards",
 		type: ["Multiplayer", "Strategy"],
 		totalPrize: 100,
 		activePools: 5,

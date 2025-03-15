@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
 import { Game, games } from "../page";
 import { pools } from "@/app/lobby/page";
+import CreatePoolForm from "@/components/lobby/create-lobby-form";
 
 // Dummy pools data - in real app this would come from an API
 
@@ -92,70 +93,7 @@ export default function CreateGame() {
 						</Card>
 
 						{/* Create Lobby Form */}
-						<Card>
-							<CardHeader>
-								<CardTitle>Create New Lobby</CardTitle>
-							</CardHeader>
-							<CardContent>
-								<form
-									action={createLobby}
-									className="space-y-4"
-								>
-									<div className="space-y-2">
-										<Label htmlFor="name">Lobby Name</Label>
-										<Input
-											id="name"
-											name="name"
-											placeholder="Enter lobby name"
-										/>
-									</div>
-
-									<div className="space-y-2">
-										<Label htmlFor="description">
-											Description (Optional)
-										</Label>
-										<Textarea
-											id="description"
-											name="description"
-											placeholder="Enter lobby description"
-										/>
-									</div>
-
-									<div className="grid grid-cols-2 gap-4">
-										<div className="space-y-2">
-											<Label htmlFor="maxPlayers">
-												Max Players
-											</Label>
-											<Input
-												id="maxPlayers"
-												name="maxPlayers"
-												type="number"
-												min="2"
-												max="100"
-												defaultValue="20"
-											/>
-										</div>
-
-										<div className="space-y-2">
-											<Label htmlFor="entryFee">
-												Entry Fee (STX)
-											</Label>
-											<Input
-												id="entryFee"
-												name="entryFee"
-												type="number"
-												min="1"
-												step="0.000001"
-											/>
-										</div>
-									</div>
-
-									<Button type="submit" className="w-full">
-										Create Lobby
-									</Button>
-								</form>
-							</CardContent>
-						</Card>
+						<CreatePoolForm games={games} />
 
 						{/* Active Lobbies */}
 						<div className="space-y-4">
