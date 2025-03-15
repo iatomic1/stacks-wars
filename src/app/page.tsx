@@ -1,6 +1,7 @@
 import HeroSection from "@/components/landing-page/hero-section";
 import Description from "@/components/landing-page/description";
 import Community from "@/components/landing-page/community";
+import Roadmap from "@/components/landing-page/roadmap";
 
 export default function LandingPage() {
 	return (
@@ -9,6 +10,8 @@ export default function LandingPage() {
 				<HeroSection />
 
 				<Description />
+
+				<Roadmap />
 
 				<Community />
 			</main>
