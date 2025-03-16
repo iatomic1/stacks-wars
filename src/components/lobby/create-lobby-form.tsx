@@ -21,8 +21,8 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Loader } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Game } from "@/lib/data/games";
+import { toast } from "sonner";
 
 interface CreateLobbyFormProps {
 	games: Game[];
@@ -33,25 +33,11 @@ export default function CreateLobbyForm({
 	games,
 	isLoading = false,
 }: CreateLobbyFormProps) {
-	const router = useRouter();
-
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		router.push(`/games/${games[0].id}/play`);
 		e.preventDefault();
-		const formData = new FormData(e.currentTarget);
-
-		// Log form data for debugging
-		console.log({
-			name: formData.get("name"),
-			amount: formData.get("amount"),
-			maxPlayers: formData.get("maxPlayers"),
-			gameId: formData.get("gameId"),
-			description: formData.get("description"),
+		toast.info("Lobby creation is coming soon!", {
+			position: "top-center",
 		});
-
-		//// Generate a random lobby ID and redirect
-		//const lobbyId = Math.random().toString(36).substring(2, 8);
-		//router.push(`/lobby/${lobbyId}`);
 	};
 
 	return (
@@ -70,6 +56,7 @@ export default function CreateLobbyForm({
 							id="name"
 							name="name"
 							placeholder="Enter pool name"
+							disabled
 						/>
 						<p className="text-sm text-muted-foreground">
 							Give your pool a descriptive name
@@ -84,6 +71,7 @@ export default function CreateLobbyForm({
 							type="number"
 							placeholder="Enter amount in STX"
 							defaultValue="100"
+							disabled
 						/>
 						<p className="text-sm text-muted-foreground">
 							This is the initial amount you&apos;ll contribute to
@@ -102,6 +90,7 @@ export default function CreateLobbyForm({
 								max={12}
 								step={1}
 								defaultValue={[4]}
+								disabled
 								onValueChange={(values) => {
 									const value = values[0];
 									document.getElementById(
@@ -118,7 +107,11 @@ export default function CreateLobbyForm({
 
 					<div className="space-y-2">
 						<Label htmlFor="gameId">Game Type</Label>
-						<Select name="gameId" defaultValue={games[0]?.id}>
+						<Select
+							name="gameId"
+							defaultValue={games[0]?.id}
+							disabled
+						>
 							<SelectTrigger>
 								<SelectValue placeholder="Select a game" />
 							</SelectTrigger>
@@ -141,6 +134,7 @@ export default function CreateLobbyForm({
 							id="description"
 							name="description"
 							placeholder="Enter pool description"
+							disabled
 						/>
 						<p className="text-sm text-muted-foreground">
 							Provide additional details about your pool
@@ -149,7 +143,7 @@ export default function CreateLobbyForm({
 				</CardContent>
 				<CardFooter className="flex justify-between">
 					<Button variant="outline" asChild>
-						<Link href="/lobby">Cancel</Link>
+						<Link href="/games">Cancel</Link>
 					</Button>
 					<Button type="submit" disabled={isLoading}>
 						{isLoading && (

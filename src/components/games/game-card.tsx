@@ -72,12 +72,12 @@ export default function GameCard({ game }: { game: Game }) {
 							{/*<Link href={`/lobby?game=${game.id}`}>
 								<Button variant="outline">Learn More</Button>
 							</Link>*/}
-							<Link href={`/games/${game.id}`}>
-								<Button className="gap-1.5">
+							<Button asChild>
+								<Link href={`/games/${game.id}`}>
 									Enter Game
-									<ArrowRight className="h-4 w-4" />
-								</Button>
-							</Link>
+									<ArrowRight />
+								</Link>
+							</Button>
 						</div>
 					</CardFooter>
 				</div>

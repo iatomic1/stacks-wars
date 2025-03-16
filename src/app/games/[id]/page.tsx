@@ -1,8 +1,15 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Gamepad2, Users, Trophy } from "lucide-react";
+import {
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	CardFooter,
+} from "@/components/ui/card";
+import { ArrowLeft, Gamepad2, Users, Trophy, PlayCircle } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
 import { Game, games } from "@/lib/data/games";
 import { pools } from "@/app/lobby/page";
@@ -75,6 +82,14 @@ export default function CreateGame() {
 									</div>
 								</div>
 							</CardContent>
+							<CardFooter>
+								<Button className="w-full" size="lg" asChild>
+									<Link href={`/games/${game.id}/play`}>
+										<PlayCircle className="mr-2 h-5 w-5" />
+										Play Now
+									</Link>
+								</Button>
+							</CardFooter>
 						</Card>
 
 						{/* Create Lobby Form */}
