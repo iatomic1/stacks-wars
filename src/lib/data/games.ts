@@ -17,7 +17,7 @@ export const games: Game[] = [
 		type: ["Singleplayer", "Strategy"],
 		totalPrize: 0,
 		activePools: 5,
-		image: "/placeholder.svg",
+		image: "/lexi-wars.webp",
 	},
 	//{
 	//	id: "2",
