@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stacks Wars - Competitive Word Gaming Platform
+
+Stacks Wars is a competitive gaming platform built on the Stacks blockchain, featuring word-based games where players can compete for STX rewards. Our flagship game, Lexi War, challenges players' vocabulary and typing speed in an exciting battle royale format.
+
+## Featured Game: Lexi War
+
+Lexi War is a fast-paced word game where players:
+
+-   Type valid English words (minimum 4 characters)
+-   Race against a 10-second countdown timer
+-   Score points based on word length
+-   Compete in real-time against other players
+-   Win STX rewards from the prize pool
+
+### Anti-Cheat Features
+
+-   No copy/paste allowed
+-   No screen reader support in competitive mode
+-   Real-time word validation
+-   Fair play monitoring
 
 ## Getting Started
 
-First, run the development server:
+First, install the dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then, run the development server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+bun run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+-   **Framework**: Next.js 14 with App Router
+-   **Styling**: Tailwind CSS
+-   **UI Components**: Shadcn/ui
+-   **State Management**: React Hooks
+-   **Blockchain**: Stacks
+-   **Font**: Geist (Sans & Mono)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                 # Next.js app router pages
+├── components/         # Reusable UI components
+├── lib/               # Utilities and shared functions
+├── context/          # React context providers
+└── config/           # Application configuration
+```
 
-## Deploy on Vercel
+## Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+-   **Modern UI/UX**: Clean, responsive design with smooth animations
+-   **Real-time Gaming**: Fast-paced word gameplay
+-   **Blockchain Integration**: STX rewards and transactions
+-   **Competitive Features**: Anti-cheat mechanisms and fair play
+-   **Social Elements**: Multiplayer lobbies and competitions
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Development
+
+The project uses several key dependencies:
+
+-   `shadcn/ui` for component library
+-   `lucide-react` for icons
+-   `tailwindcss` for styling
+-   `sonner` for toast notifications
+
+## Contributing
+
+Contributions are welcome! Please read our contributing guidelines before submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+
+For questions or support, please open an issue in the repository.
