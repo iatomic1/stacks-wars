@@ -59,7 +59,7 @@ export const metadata: Metadata = {
 			"Join the next generation of competitive gaming. Compete in various blockchain-powered games, participate in tournaments, and win STX rewards on the Stacks blockchain.",
 		images: [
 			{
-				url: "https://stackswars.com/og-image.jpg",
+				url: "https://stackswars.com/og-image.webp?height=1200&width=630",
 				width: 1200,
 				height: 630,
 				alt: "Stacks Wars - Web3 Gaming Platform",
@@ -72,16 +72,22 @@ export const metadata: Metadata = {
 		description:
 			"Discover a new era of competitive gaming on the Stacks blockchain. Multiple games, exciting tournaments, and STX rewards await.",
 		creator: "@stackswars",
-		images: ["https://stackswars.com/twitter-image.jpg"],
+		images: [
+			"https://stackswars.com/twitter-image.webp?height=1200&width=630",
+		],
 	},
 	icons: {
 		icon: [
 			{ url: "/favicon.ico" },
-			{ url: "/icon.png", type: "image/png" },
+			{ url: "/icon.webp?height=32&width=32", type: "image/webp" },
 		],
 		apple: [
-			{ url: "/apple-icon.png" },
-			{ url: "/apple-icon-72x72.png", sizes: "72x72", type: "image/png" },
+			{ url: "/icon.webp" },
+			{
+				url: "/icon.webp?height=72&width=72",
+				sizes: "72x72",
+				type: "image/webp",
+			},
 			{
 				url: "/apple-icon-114x114.png",
 				sizes: "114x114",

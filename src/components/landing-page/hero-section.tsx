@@ -10,7 +10,7 @@ export default function HeroSection() {
 			<div className="container px-4 md:px-6">
 				<div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
 					<Image
-						src="/placeholder.svg?height=550&width=550"
+						src="/stacks-wars.webp?height=550&width=550"
 						width={550}
 						height={550}
 						alt="Stacks Wars Lobby"
