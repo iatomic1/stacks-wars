@@ -36,7 +36,7 @@ export default function CreateLobbyForm({
 	const router = useRouter();
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		router.push(`/lobby/${games[0].id}`);
+		router.push(`/games/${games[0].id}/play`);
 		e.preventDefault();
 		const formData = new FormData(e.currentTarget);
 
@@ -151,11 +151,7 @@ export default function CreateLobbyForm({
 					<Button variant="outline" asChild>
 						<Link href="/lobby">Cancel</Link>
 					</Button>
-					<Button
-						type="submit"
-						onClick={() => router.push(`/lobby/${games[0].id}`)}
-						disabled={isLoading}
-					>
+					<Button type="submit" disabled={isLoading}>
 						{isLoading && (
 							<Loader
 								className="h-4 w-4 mr-1 animate-spin"
