@@ -22,26 +22,37 @@ import { Slider } from "@/components/ui/slider";
 import { Loader } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Game } from "@/app/games/page";
+import { Game } from "@/lib/data/games";
 
 interface CreateLobbyFormProps {
 	games: Game[];
 	isLoading?: boolean;
-	onSubmit: (values: {
-		name: string;
-		amount: number;
-		maxPlayers: number;
-		gameId: string;
-		description: string;
-	}) => void;
 }
 
 export default function CreateLobbyForm({
 	games,
 	isLoading = false,
-	onSubmit,
 }: CreateLobbyFormProps) {
 	const router = useRouter();
+
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		router.push(`/lobby/${games[0].id}`);
+		e.preventDefault();
+		const formData = new FormData(e.currentTarget);
+
+		// Log form data for debugging
+		console.log({
+			name: formData.get("name"),
+			amount: formData.get("amount"),
+			maxPlayers: formData.get("maxPlayers"),
+			gameId: formData.get("gameId"),
+			description: formData.get("description"),
+		});
+
+		//// Generate a random lobby ID and redirect
+		//const lobbyId = Math.random().toString(36).substring(2, 8);
+		//router.push(`/lobby/${lobbyId}`);
+	};
 
 	return (
 		<Card>
@@ -51,20 +62,7 @@ export default function CreateLobbyForm({
 					Set up a new lobby and invite friends to join
 				</CardDescription>
 			</CardHeader>
-			<form
-				onSubmit={(e) => {
-					e.preventDefault();
-					const formData = new FormData(e.currentTarget);
-					const values = {
-						name: formData.get("name") as string,
-						amount: Number(formData.get("amount")),
-						maxPlayers: Number(formData.get("maxPlayers")),
-						gameId: formData.get("gameId") as string,
-						description: formData.get("description") as string,
-					};
-					onSubmit(values);
-				}}
-			>
+			<form onSubmit={handleSubmit}>
 				<CardContent className="space-y-3">
 					<div className="space-y-2">
 						<Label htmlFor="name">Lobby Name</Label>
@@ -85,6 +83,7 @@ export default function CreateLobbyForm({
 							name="amount"
 							type="number"
 							placeholder="Enter amount in STX"
+							defaultValue="100"
 						/>
 						<p className="text-sm text-muted-foreground">
 							This is the initial amount you&apos;ll contribute to
@@ -119,16 +118,13 @@ export default function CreateLobbyForm({
 
 					<div className="space-y-2">
 						<Label htmlFor="gameId">Game Type</Label>
-						<Select
-							name="gameId"
-							defaultValue={games.length > 0 ? games[0].id : ""}
-						>
+						<Select name="gameId" defaultValue={games[0]?.id}>
 							<SelectTrigger>
 								<SelectValue placeholder="Select a game" />
 							</SelectTrigger>
 							<SelectContent>
-								{games.map((game, index) => (
-									<SelectItem value={game.id} key={index}>
+								{games.map((game) => (
+									<SelectItem value={game.id} key={game.id}>
 										{game.name}
 									</SelectItem>
 								))}
@@ -156,10 +152,8 @@ export default function CreateLobbyForm({
 						<Link href="/lobby">Cancel</Link>
 					</Button>
 					<Button
-						onClick={() => {
-							router.push(`/lobby/${games[0].id}`);
-						}}
 						type="submit"
+						onClick={() => router.push(`/lobby/${games[0].id}`)}
 						disabled={isLoading}
 					>
 						{isLoading && (

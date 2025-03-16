@@ -28,8 +28,8 @@ import slugify from "react-slugify";
 //import { getPoolById } from "@/lib/services/pools";
 //import getTransaction from "@/lib/services/transactions";
 //import { EXPLORER_BASE_URL } from "@/lib/constants";
-import InitialisePool from "./_components/initialise-pool";
-import { SmartContractTransaction } from "@/types/transaction";
+//import InitialisePool from "./_components/initialise-pool";
+//import { SmartContractTransaction } from "@/types/transaction";
 
 export default async function PoolDetailPage({
 	params,
@@ -99,17 +99,17 @@ export default async function PoolDetailPage({
 	};
 
 	//ts-ignore
-	const initializeTx: SmartContractTransaction = {
-		tx_status: "success",
-		sender_address: "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
-		tx_id: "0x123",
-		nonce: 0,
-		fee_rate: "0.01",
-		sponsored: false,
-		post_condition_mode: "deny",
-		post_conditions: [],
-		anchor_mode: "any",
-	};
+	//const initializeTx: SmartContractTransaction = {
+	//	tx_status: "success",
+	//	sender_address: "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
+	//	tx_id: "0x123",
+	//	nonce: 0,
+	//	fee_rate: "0.01",
+	//	sponsored: false,
+	//	post_condition_mode: "deny",
+	//	post_conditions: [],
+	//	anchor_mode: "any",
+	//};
 
 	// Constants
 	const EXPLORER_BASE_URL = "https://explorer.stacks.co/";
@@ -127,11 +127,11 @@ export default async function PoolDetailPage({
 			<main className="flex-1">
 				<div className="container max-w-7xl px-4 py-4 sm:px-6 sm:py-6">
 					<Link
-						href="/pools"
+						href="/lobby"
 						className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4 sm:mb-6"
 					>
 						<ArrowLeft className="h-4 w-4" />
-						<span>Back to Pools</span>
+						<span>Back to Lobby</span>
 					</Link>
 
 					{/* Hero Section */}
@@ -140,7 +140,7 @@ export default async function PoolDetailPage({
 							<h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight break-words">
 								{pool.name}
 							</h1>
-							{deployTx?.tx_status === "success" &&
+							{/*{deployTx?.tx_status === "success" &&
 								initializeTx?.tx_status !== "success" && (
 									<InitialisePool
 										poolCreatorAddress={
@@ -156,7 +156,7 @@ export default async function PoolDetailPage({
 										)}
 										poolId={pool.id}
 									/>
-								)}
+								)}*/}
 						</div>
 						<p className="text-sm sm:text-base text-muted-foreground max-w-3xl break-words">
 							{pool.description}
@@ -499,8 +499,10 @@ export default async function PoolDetailPage({
 											Number.parseFloat(pool.amount) /
 											pool.maxPlayers
 										}
-										pool={pool}
-										initializeTx={initializeTx}
+										maxPlayers={pool.maxPlayers}
+										currentPlayers={
+											pool.participants.length
+										}
 									/>
 								</Suspense>
 

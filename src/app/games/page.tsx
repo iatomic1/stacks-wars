@@ -1,48 +1,6 @@
 //import { getAllGames } from "@/lib/services/games";
 import GameCard from "@/components/games/game-card";
-
-export interface Game {
-	id: string;
-	name: string;
-	description: string;
-	type: string[];
-	totalPrize: number;
-	activePools: number;
-	image: string;
-}
-
-export const games: Game[] = [
-	{
-		id: "1",
-		name: "Lexi War",
-		description:
-			"Challenge players in our word-rule game and compete for STX rewards",
-		type: ["Multiplayer", "Strategy"],
-		totalPrize: 100,
-		activePools: 5,
-		image: "/placeholder.svg",
-	},
-	{
-		id: "2",
-		name: "Lexi War",
-		description:
-			"Challenge players in our word-rule game and compete for STX rewards",
-		type: ["Multiplayer", "Strategy"],
-		totalPrize: 100,
-		activePools: 5,
-		image: "/placeholder.svg",
-	},
-	{
-		id: "3",
-		name: "Lexi War",
-		description:
-			"Challenge players in our word-rule game and compete for STX rewards",
-		type: ["Multiplayer", "Strategy"],
-		totalPrize: 100,
-		activePools: 5,
-		image: "/placeholder.svg",
-	},
-];
+import { games } from "@/lib/data/games";
 
 export default async function GamesPage() {
 	//const games = await getAllGames();

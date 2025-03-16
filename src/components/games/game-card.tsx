@@ -11,7 +11,7 @@ import { Trophy, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { Game } from "@/app/games/page";
+import { Game } from "@/lib/data/games";
 
 export default function GameCard({ game }: { game: Game }) {
 	return (

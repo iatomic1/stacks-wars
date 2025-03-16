@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 //import { getAllGames } from "@/lib/services/games";
 import CreateLobbyForm from "@/components/lobby/create-lobby-form";
-import { games } from "@/app/games/page";
+import { games } from "@/lib/data/games";
 
 export default async function CreatePoolPage() {
 	//const games = await getAllGames();

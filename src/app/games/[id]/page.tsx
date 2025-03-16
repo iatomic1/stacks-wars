@@ -4,7 +4,7 @@ import { ArrowLeft, Gamepad2, Users, Trophy } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
-import { Game, games } from "../page";
+import { Game, games } from "@/lib/data/games";
 import { pools } from "@/app/lobby/page";
 import CreatePoolForm from "@/components/lobby/create-lobby-form";
 
