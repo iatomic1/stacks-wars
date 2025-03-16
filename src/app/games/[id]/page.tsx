@@ -82,7 +82,7 @@ export default function CreateGame() {
 
 						{/* Active Lobbies */}
 						<div className="space-y-4">
-							<h2 className="text-xl font-semibold">
+							<h2 className="text-2xl font-bold tracking-tighter sm:text-3xl">
 								Active Lobbies
 							</h2>
 							<ActiveLobbies pools={pools} />
