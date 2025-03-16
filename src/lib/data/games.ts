@@ -14,29 +14,29 @@ export const games: Game[] = [
 		name: "Lexi War",
 		description:
 			"Challenge players in our word-rule game and compete for STX rewards",
-		type: ["Multiplayer", "Strategy"],
-		totalPrize: 100,
+		type: ["Singleplayer", "Strategy"],
+		totalPrize: 0,
 		activePools: 5,
 		image: "/placeholder.svg",
 	},
-	{
-		id: "2",
-		name: "Lexi War",
-		description:
-			"Challenge players in our word-rule game and compete for STX rewards",
-		type: ["Multiplayer", "Strategy"],
-		totalPrize: 100,
-		activePools: 5,
-		image: "/placeholder.svg",
-	},
-	{
-		id: "3",
-		name: "Lexi War",
-		description:
-			"Challenge players in our word-rule game and compete for STX rewards",
-		type: ["Multiplayer", "Strategy"],
-		totalPrize: 100,
-		activePools: 5,
-		image: "/placeholder.svg",
-	},
+	//{
+	//	id: "2",
+	//	name: "Lexi War",
+	//	description:
+	//		"Challenge players in our word-rule game and compete for STX rewards",
+	//	type: ["Multiplayer", "Strategy"],
+	//	totalPrize: 100,
+	//	activePools: 5,
+	//	image: "/placeholder.svg",
+	//},
+	//{
+	//	id: "3",
+	//	name: "Lexi War",
+	//	description:
+	//		"Challenge players in our word-rule game and compete for STX rewards",
+	//	type: ["Multiplayer", "Strategy"],
+	//	totalPrize: 100,
+	//	activePools: 5,
+	//	image: "/placeholder.svg",
+	//},
 ];

@@ -17,7 +17,7 @@ export default function SiteHeader() {
 	const navLinks = [
 		{ href: "/", label: "Home" },
 		{ href: "/games", label: "Games" },
-		{ href: "/lobby", label: "Lobby" },
+		//{ href: "/lobby", label: "Lobby" },
 		{ href: "/leaderboard", label: "Leaderboard" },
 	];
 
@@ -27,7 +27,7 @@ export default function SiteHeader() {
 				<Link href={"/"}>
 					<div className="flex items-center gap-2">
 						<Image
-							src="/placeholder.svg?height=32&width=32"
+							src="/stacks-wars.webp?height=32&width=32"
 							alt="Stacks Wars Logo"
 							width={32}
 							height={32}
