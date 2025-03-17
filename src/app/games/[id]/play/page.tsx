@@ -2,8 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { ArrowLeft, User } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -11,14 +9,10 @@ import GameRule from "@/components/games/game-rule";
 import GameTimer from "@/components/games/game-timer";
 import GameHeader from "@/components/games/game-header";
 import words from "an-array-of-english-words";
-import dynamic from "next/dynamic";
 import { db } from "@/lib/db";
-
-const Keyboard = dynamic(() => import("react-simple-keyboard"), {
-	ssr: false,
-	loading: () => null,
-});
-import "react-simple-keyboard/build/css/index.css";
+import KeyboardComp from "@/components/games/keyboard-comp";
+import LexiInputForm from "@/components/games/lexi-input-form";
+import { rules } from "@/lib/lexiValidationRule";
 
 export default function LexiWar() {
 	const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
@@ -28,8 +22,12 @@ export default function LexiWar() {
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const gameStateRef = useRef({ isTimeUp: false, isStarted: false });
-	const keyboardRef = useRef(null);
 	const [highScore, setHighScore] = useState(0);
+	const [currentRuleIndex, setCurrentRuleIndex] = useState(0);
+	const [ruleRepeatCount, setRuleRepeatCount] = useState(0);
+	const [requiredRepeats, setRequiredRepeats] = useState(2);
+	const [randomLetter, setRandomLetter] = useState("a");
+	const [randomLength, setRandomLength] = useState(4);
 
 	// Detect mobile device
 	useEffect(() => {
@@ -39,15 +37,6 @@ export default function LexiWar() {
 			)
 		);
 	}, []);
-
-	const handlePaste = (e: React.ClipboardEvent) => {
-		e.preventDefault();
-		toast.error("Pasting is not allowed!", { position: "top-center" });
-	};
-
-	const handleCopy = (e: React.ClipboardEvent) => {
-		e.preventDefault();
-	};
 
 	useEffect(() => {
 		let timer: NodeJS.Timeout;
@@ -79,11 +68,9 @@ export default function LexiWar() {
 					});
 			}
 
-			setTimeout(() => {
-				toast.info(`Time's up! Final Score: ${score}`, {
-					position: "top-center",
-				});
-			}, 1000);
+			toast.info(`Time's up! Final Score: ${score}`, {
+				position: "top-center",
+			});
 			setWord("");
 		}
 		return () => clearInterval(timer);
@@ -93,32 +80,24 @@ export default function LexiWar() {
 		return word.replace(/\s+/g, "").toLowerCase();
 	};
 
-	const isValidWord = useCallback(
-		(word: string) => {
-			const cleanWord = normalizeWord(word);
-			if (usedWords.has(cleanWord)) {
-				toast.error("You've already used this word!", {
-					position: "top-center",
-				});
-				return false;
-			}
-			return words.includes(cleanWord);
-		},
-		[usedWords]
-	);
+	const isValidWord = useCallback((word: string) => {
+		const cleanWord = normalizeWord(word);
+		return words.includes(cleanWord);
+	}, []);
+
+	// Generate new random values when rule changes
+	useEffect(() => {
+		setRandomLetter(
+			"abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)]
+		);
+		setRandomLength(Math.floor(Math.random() * 6) + 4);
+	}, [currentRuleIndex, ruleRepeatCount]);
 
 	const handleSubmit = (e?: React.FormEvent) => {
 		e?.preventDefault();
 		if (!isPlaying) return;
 
 		const cleanWord = normalizeWord(word);
-
-		if (cleanWord.length < 4) {
-			toast.error("Word must be at least 4 characters!", {
-				position: "top-center",
-			});
-			return;
-		}
 
 		if (usedWords.has(cleanWord)) {
 			toast.error("You've already used this word!", {
@@ -132,12 +111,56 @@ export default function LexiWar() {
 			return;
 		}
 
-		// Add the word to used words
-		setUsedWords((prev) => new Set(prev).add(cleanWord));
+		if (!rules[0].validator(cleanWord)) return;
 
+		// Get current rule
+		const currentRule = rules[currentRuleIndex];
+
+		// Validate against current rule
+		if (
+			currentRuleIndex !== 0 &&
+			!currentRule.validator(
+				cleanWord,
+				currentRule.rule.includes("random letter")
+					? randomLetter
+					: randomLength
+			)
+		) {
+			return;
+		}
+
+		// Word is valid, update game state
+		setUsedWords((prev) => new Set(prev).add(cleanWord));
 		const points = cleanWord.length;
 		setScore((prev) => prev + points);
 		setWord("");
+
+		// Update rule progression
+		setRuleRepeatCount((prev) => {
+			const newCount = prev + 1;
+			if (newCount >= requiredRepeats) {
+				// Move to next rule
+				const nextRuleIndex = (currentRuleIndex + 1) % rules.length;
+				setCurrentRuleIndex(nextRuleIndex);
+
+				// Calculate next required repeats
+				if (requiredRepeats === 4) {
+					setRequiredRepeats(2); // Reset to 2 if we hit 4
+				} else {
+					setRequiredRepeats((prev) => prev + 1); // Increment repeats
+				}
+
+				// Announce level up
+				toast.success(`Level Up! New challenge unlocked!`, {
+					position: "top-center",
+					duration: 3000,
+				});
+
+				return 0; // Reset repeat count
+			}
+			return newCount;
+		});
+
 		toast.success(`Valid word! +${points} points`, {
 			position: "top-center",
 		});
@@ -152,10 +175,12 @@ export default function LexiWar() {
 			setTimeLeft(10);
 			setScore(0);
 			setWord("");
-			// Reset used words when starting a new game
 			setUsedWords(new Set());
+			setCurrentRuleIndex(0);
+			setRuleRepeatCount(0);
+			setRequiredRepeats(2);
 			toast.info(
-				"Game started! Type words that are at least 4 characters long. Each word can only be used once!",
+				"Game started! Follow the rules shown above. Each level brings new challenges!",
 				{ position: "top-center" }
 			);
 
@@ -208,7 +233,22 @@ export default function LexiWar() {
 						<GameHeader score={score} highScore={highScore} />
 
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<GameRule />
+							<GameRule
+								currentRule={
+									rules[currentRuleIndex].getRule
+										? rules[currentRuleIndex].getRule(
+												rules[
+													currentRuleIndex
+												].rule.includes("random letter")
+													? randomLetter
+													: randomLength
+										  )
+										: rules[currentRuleIndex].rule
+								}
+								currentRuleIndex={currentRuleIndex}
+								repeatCount={ruleRepeatCount}
+								requiredRepeats={requiredRepeats}
+							/>
 							<GameTimer timeLeft={timeLeft} />
 						</div>
 
@@ -223,84 +263,23 @@ export default function LexiWar() {
 							</CardHeader>
 
 							<CardContent>
-								<form
-									onSubmit={handleSubmit}
-									autoComplete="off"
-									className="space-y-4"
-								>
-									<Input
-										type="text"
-										placeholder={
-											isPlaying
-												? "Type your word here..."
-												: "Press Start Game to begin"
-										}
-										value={word}
-										onChange={(e) =>
-											setWord(
-												e.target.value.toLowerCase()
-											)
-										}
-										onPaste={handlePaste}
-										onCopy={handleCopy}
-										onCut={handleCopy}
-										disabled={!isPlaying || timeLeft === 0}
-										className="text-lg select-none"
-										tabIndex={-1}
-										autoFocus={!isMobile}
-										autoComplete="off"
-										aria-hidden="true"
-										autoCorrect="off"
-										spellCheck="false"
-										autoCapitalize="off"
-										inputMode="none"
-										aria-autocomplete="none"
-										readOnly={isMobile}
-									/>
-									<div className="flex justify-end">
-										<Button
-											onClick={() => {
-												if (!isPlaying) startGame();
-												else handleSubmit();
-											}}
-											type="button"
-											size="lg"
-											className="w-full md:w-auto"
-											aria-hidden="true"
-											tabIndex={-1}
-										>
-											{!isPlaying
-												? "Start Game"
-												: "Enter"}
-										</Button>
-									</div>
-								</form>
+								<LexiInputForm
+									handleSubmit={handleSubmit}
+									isPlaying={isPlaying}
+									word={word}
+									setWord={setWord}
+									timeLeft={timeLeft}
+									isMobile={isMobile}
+									startGame={startGame}
+								/>
 							</CardContent>
 						</Card>
 					</div>
 
 					{isMobile && isPlaying && (
-						<div className="keyboard">
-							<Keyboard
-								keyboardRef={(r) => (keyboardRef.current = r)}
-								layoutName="default"
-								layout={{
-									default: [
-										"q w e r t y u i o p",
-										"a s d f g h j k l",
-										"z x c v b n m {bksp}",
-										"{enter}",
-									],
-								}}
-								display={{
-									"{bksp}": "⌫",
-									"{enter}": "Enter",
-								}}
-								onKeyPress={handleKeyboardInput}
-								disableButtonHold
-								physicalKeyboardHighlight={false}
-							/>
-						</div>
+						<KeyboardComp
+							handleKeyboardInput={handleKeyboardInput}
+						/>
 					)}
 
 					<div className="sr-only" role="alert">
