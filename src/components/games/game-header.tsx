@@ -1,9 +1,14 @@
 import React from "react";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
-import { Trophy, Brain } from "lucide-react";
+import { Trophy, Brain, Target } from "lucide-react";
 
-export default function GameHeader({ score }: { score: number }) {
+interface GameHeaderProps {
+	score: number;
+	highScore: number;
+}
+
+export default function GameHeader({ score, highScore }: GameHeaderProps) {
 	return (
 		<Card>
 			<CardHeader>
@@ -19,10 +24,19 @@ export default function GameHeader({ score }: { score: number }) {
 							</CardDescription>
 						</div>
 					</div>
-					<Badge variant="outline" className="text-lg px-3 py-1">
-						<Trophy className="h-4 w-4 mr-1" />
-						{score}
-					</Badge>
+					<div className="flex items-center gap-3">
+						<Badge variant="outline" className="text-lg px-3 py-1">
+							<Target className="h-4 w-4 mr-1" />
+							{score}
+						</Badge>
+						<Badge
+							variant="outline"
+							className="text-lg px-3 py-1 bg-primary/10"
+						>
+							<Trophy className="h-4 w-4 mr-1" />
+							{highScore}
+						</Badge>
+					</div>
 				</div>
 			</CardHeader>
 		</Card>

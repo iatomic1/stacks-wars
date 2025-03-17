@@ -12,13 +12,32 @@ import GameTimer from "@/components/games/game-timer";
 import GameHeader from "@/components/games/game-header";
 import words from "an-array-of-english-words";
 import dynamic from "next/dynamic";
+import Dexie, { Table } from "dexie";
 
 const Keyboard = dynamic(() => import("react-simple-keyboard"), {
 	ssr: false,
 	loading: () => null,
 });
-
 import "react-simple-keyboard/build/css/index.css";
+
+interface HighScore {
+	id?: number;
+	score: number;
+	timestamp: Date;
+}
+
+export class GameDatabase extends Dexie {
+	singleplayerV1!: Table<HighScore>;
+
+	constructor() {
+		super("GameDatabase");
+		this.version(1).stores({
+			singleplayerV1: "++id, score, timestamp",
+		});
+	}
+}
+
+export const db = new GameDatabase();
 
 export default function LexiWar() {
 	const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
@@ -29,6 +48,7 @@ export default function LexiWar() {
 	const [isMobile, setIsMobile] = useState(false);
 	const gameStateRef = useRef({ isTimeUp: false, isStarted: false });
 	const keyboardRef = useRef(null);
+	const [highScore, setHighScore] = useState(0);
 
 	// Detect mobile device
 	useEffect(() => {
@@ -57,10 +77,35 @@ export default function LexiWar() {
 		} else if (timeLeft === 0 && !gameStateRef.current.isTimeUp) {
 			setIsPlaying(false);
 			gameStateRef.current.isTimeUp = true;
-			toast.error("Time's up!", { position: "top-center" });
+
+			if (score > highScore) {
+				const improvement = score - highScore;
+				db.singleplayerV1
+					.put({
+						id: 1,
+						score: score,
+						timestamp: new Date(),
+					})
+					.then(() => {
+						setHighScore(score);
+						toast.success(
+							`New High Score! 🎉\nPrevious: ${highScore}\nNew: ${score}\nImprovement: +${improvement}`,
+							{
+								position: "top-center",
+								duration: 3000,
+							}
+						);
+					});
+			}
+
+			setTimeout(() => {
+				toast.error(`Time's up! Final Score: ${score}`, {
+					position: "top-center",
+				});
+			}, 1000);
 		}
 		return () => clearInterval(timer);
-	}, [isPlaying, timeLeft]);
+	}, [isPlaying, timeLeft, score, highScore]);
 
 	const normalizeWord = (word: string) => {
 		return word.replace(/\s+/g, "").toLowerCase();
@@ -151,6 +196,16 @@ export default function LexiWar() {
 		}
 	};
 
+	useEffect(() => {
+		const loadHighScore = async () => {
+			const record = await db.singleplayerV1.get(1);
+			if (record) {
+				setHighScore(record.score);
+			}
+		};
+		loadHighScore();
+	}, []);
+
 	return (
 		<div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
 			<main className="flex-1">
@@ -168,7 +223,7 @@ export default function LexiWar() {
 						aria-hidden="true"
 						role="presentation"
 					>
-						<GameHeader score={score} />
+						<GameHeader score={score} highScore={highScore} />
 
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<GameRule />
