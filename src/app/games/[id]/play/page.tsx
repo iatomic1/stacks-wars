@@ -103,15 +103,20 @@ export default function LexiWar() {
 			toast.error("You've already used this word!", {
 				position: "top-center",
 			});
+			setWord("");
 			return;
 		}
 
 		if (!isValidWord(cleanWord)) {
 			toast.error("Invalid word! Try again.", { position: "top-center" });
+			setWord("");
 			return;
 		}
 
-		if (!rules[0].validator(cleanWord)) return;
+		if (!rules[0].validator(cleanWord)) {
+			setWord("");
+			return;
+		}
 
 		// Get current rule
 		const currentRule = rules[currentRuleIndex];
@@ -126,6 +131,7 @@ export default function LexiWar() {
 					: randomLength
 			)
 		) {
+			setWord("");
 			return;
 		}
 

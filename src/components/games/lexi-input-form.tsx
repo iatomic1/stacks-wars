@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
@@ -22,6 +22,8 @@ export default function LexiInputForm({
 	isMobile,
 	startGame,
 }: LexiInputFormProps) {
+	const inputRef = useRef<HTMLInputElement>(null);
+
 	const handlePaste = (e: React.ClipboardEvent) => {
 		e.preventDefault();
 		toast.error("Pasting is not allowed!", { position: "top-center" });
@@ -31,9 +33,17 @@ export default function LexiInputForm({
 		e.preventDefault();
 	};
 
+	const handleStartGame = () => {
+		startGame();
+		setTimeout(() => {
+			inputRef.current?.focus();
+		}, 50); // Small delay to ensure state updates first
+	};
+
 	return (
 		<form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
 			<Input
+				ref={inputRef}
 				type="text"
 				placeholder={
 					isPlaying
@@ -61,8 +71,11 @@ export default function LexiInputForm({
 			<div className="flex justify-end">
 				<Button
 					onClick={() => {
-						if (!isPlaying) startGame();
-						else handleSubmit();
+						if (!isPlaying) {
+							handleStartGame();
+						} else {
+							handleSubmit();
+						}
 					}}
 					type="button"
 					size="lg"
