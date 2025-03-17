@@ -103,6 +103,7 @@ export default function LexiWar() {
 					position: "top-center",
 				});
 			}, 1000);
+			setWord("");
 		}
 		return () => clearInterval(timer);
 	}, [isPlaying, timeLeft, score, highScore]);
@@ -277,7 +278,10 @@ export default function LexiWar() {
 									/>
 									<div className="flex justify-end">
 										<Button
-											onClick={startGame}
+											onClick={() => {
+												if (!isPlaying) startGame();
+												else handleSubmit();
+											}}
 											type="button"
 											size="lg"
 											className="w-full md:w-auto"
