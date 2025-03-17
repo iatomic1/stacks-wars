@@ -1,85 +1,61 @@
-# Stacks Wars - Competitive Word Gaming Platform
+# Stacks Wars
 
-Stacks Wars is a competitive gaming platform built on the Stacks blockchain, featuring word-based games where players can compete for STX rewards. Our flagship game, Lexi War, challenges players' vocabulary and typing speed in an exciting battle royale format.
-
-## Featured Game: Lexi War
-
-Lexi War is a fast-paced word game where players:
-
--   Type valid English words (minimum 4 characters)
--   Race against a 10-second countdown timer
--   Score points based on word length
--   Compete in real-time against other players
--   Win STX rewards from the prize pool
-
-### Anti-Cheat Features
-
--   No copy/paste allowed
--   No screen reader support in competitive mode
--   Real-time word validation
--   Fair play monitoring
-
-## Getting Started
-
-First, install the dependencies:
-
-```bash
-bun install
-```
-
-Then, run the development server:
-
-```bash
-bun run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
-
-## Tech Stack
-
--   **Framework**: Next.js 14 with App Router
--   **Styling**: Tailwind CSS
--   **UI Components**: Shadcn/ui
--   **State Management**: React Hooks
--   **Blockchain**: Stacks
--   **Font**: Geist (Sans & Mono)
-
-## Project Structure
-
-```
-src/
-├── app/                 # Next.js app router pages
-├── components/         # Reusable UI components
-├── lib/               # Utilities and shared functions
-├── context/          # React context providers
-└── config/           # Application configuration
-```
+Stacks Wars is a **gaming utility platform** built on the **Stacks blockchain**, offering various game types such as **casino games, sports betting, casual games, and aviator-style games**. Players can participate using **STX** as the primary mode of payment.
 
 ## Features
 
--   **Modern UI/UX**: Clean, responsive design with smooth animations
--   **Real-time Gaming**: Fast-paced word gameplay
--   **Blockchain Integration**: STX rewards and transactions
--   **Competitive Features**: Anti-cheat mechanisms and fair play
--   **Social Elements**: Multiplayer lobbies and competitions
+-   **Multiple Game Modes:** Includes casino, sports betting, casual games, and more.
+-   **Lexi War (Spelling Mini-Game):** Turn-based spelling game with real-time multiplayer in future updates.
+-   **Blockchain-Powered Betting:** Uses STX for transactions.
+-   **Progressive Difficulty:** Games increase in complexity based on player performance.
+-   **Word Validation API:** Utilizes Wordnik API for spelling-based game validation.
+-   **User Authentication & Wallet Integration:** Seamlessly connects with Stacks wallets for transactions.
 
-## Development
+## Tech Stack
 
-The project uses several key dependencies:
+-   **Frontend:** Next.js, React, Tailwind CSS
+-   **Backend:** Node.js (Planned for backend logic)
+-   **Smart Contracts:** Clarity (for on-chain interactions)
+-   **Game Logic:** AWS Bedrock (Lexi War AI), IndexedDB (local storage for game state)
+-   **APIs:** Wordnik API for word validation
+-   **Hosting:** Vercel
 
--   `shadcn/ui` for component library
--   `lucide-react` for icons
--   `tailwindcss` for styling
--   `sonner` for toast notifications
+## Installation & Setup
 
-## Contributing
+To set up the project locally:
 
-Contributions are welcome! Please read our contributing guidelines before submitting pull requests.
+```sh
+git clone https://github.com/yourusername/stacks-wars.git
+cd stacks-wars
+npm install
+npm run dev
+```
+
+## How to Play (Lexi War)
+
+1. **Start a Game:** Choose a game mode (turn-based initially).
+2. **Enter Words:** Type words based on given letter constraints.
+3. **Progress Difficulty:** Longer words are required as the game progresses.
+4. **Win or Lose:** If no valid word is entered before time runs out, the opponent wins.
+
+## Roadmap
+
+-   ✅ Initial game release with **Lexi War** (turn-based mode)
+-   🚀 Real-time multiplayer support
+-   💰 On-chain betting and rewards system
+-   📊 Leaderboard & ranking system
+-   🎨 Improved UI/UX animations & effects
+
+## Contribution
+
+We welcome contributions! Feel free to fork the repo and submit a pull request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License
 
 ## Contact
 
-For questions or support, please open an issue in the repository.
+For questions, reach out via Twitter or Discord.
+
+🚀 **Stacks Wars – Where Gaming Meets DeFi!**
