@@ -12,32 +12,13 @@ import GameTimer from "@/components/games/game-timer";
 import GameHeader from "@/components/games/game-header";
 import words from "an-array-of-english-words";
 import dynamic from "next/dynamic";
-import Dexie, { Table } from "dexie";
+import { db } from "@/lib/db";
 
 const Keyboard = dynamic(() => import("react-simple-keyboard"), {
 	ssr: false,
 	loading: () => null,
 });
 import "react-simple-keyboard/build/css/index.css";
-
-interface HighScore {
-	id?: number;
-	score: number;
-	timestamp: Date;
-}
-
-export class GameDatabase extends Dexie {
-	singleplayerV1!: Table<HighScore>;
-
-	constructor() {
-		super("GameDatabase");
-		this.version(1).stores({
-			singleplayerV1: "++id, score, timestamp",
-		});
-	}
-}
-
-export const db = new GameDatabase();
 
 export default function LexiWar() {
 	const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
@@ -99,7 +80,7 @@ export default function LexiWar() {
 			}
 
 			setTimeout(() => {
-				toast.error(`Time's up! Final Score: ${score}`, {
+				toast.info(`Time's up! Final Score: ${score}`, {
 					position: "top-center",
 				});
 			}, 1000);

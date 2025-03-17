@@ -12,7 +12,7 @@ export class GameDatabase extends Dexie {
 	constructor() {
 		super("GameDatabase");
 		this.version(1).stores({
-			singleplayerV1: "id,score,timestamp", // Remove autoincrement (++)
+			singleplayerV1: "id,score,timestamp",
 		});
 	}
 }
