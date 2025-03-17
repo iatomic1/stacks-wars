@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ const Keyboard = dynamic(() => import("react-simple-keyboard"), {
 import "react-simple-keyboard/build/css/index.css";
 
 export default function LexiWar() {
+	const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
 	const [word, setWord] = useState("");
 	const [timeLeft, setTimeLeft] = useState(10);
 	const [score, setScore] = useState(0);
@@ -61,17 +62,39 @@ export default function LexiWar() {
 		return () => clearInterval(timer);
 	}, [isPlaying, timeLeft]);
 
-	const isValidWord = (word: string) => words.includes(word.toLowerCase());
+	const normalizeWord = (word: string) => {
+		return word.replace(/\s+/g, "").toLowerCase();
+	};
+
+	const isValidWord = useCallback(
+		(word: string) => {
+			const cleanWord = normalizeWord(word);
+			if (usedWords.has(cleanWord)) {
+				toast.error("You've already used this word!", {
+					position: "top-center",
+				});
+				return false;
+			}
+			return words.includes(cleanWord);
+		},
+		[usedWords]
+	);
 
 	const handleSubmit = (e?: React.FormEvent) => {
 		e?.preventDefault();
 		if (!isPlaying) return;
 
-		// Remove all spaces from the word before validation
-		const cleanWord = word.replace(/\s+/g, "");
+		const cleanWord = normalizeWord(word);
 
 		if (cleanWord.length < 4) {
 			toast.error("Word must be at least 4 characters!", {
+				position: "top-center",
+			});
+			return;
+		}
+
+		if (usedWords.has(cleanWord)) {
+			toast.error("You've already used this word!", {
 				position: "top-center",
 			});
 			return;
@@ -81,6 +104,9 @@ export default function LexiWar() {
 			toast.error("Invalid word! Try again.", { position: "top-center" });
 			return;
 		}
+
+		// Add the word to used words
+		setUsedWords((prev) => new Set(prev).add(cleanWord));
 
 		const points = cleanWord.length;
 		setScore((prev) => prev + points);
@@ -99,8 +125,10 @@ export default function LexiWar() {
 			setTimeLeft(10);
 			setScore(0);
 			setWord("");
+			// Reset used words when starting a new game
+			setUsedWords(new Set());
 			toast.info(
-				"Game started! Type words that are at least 4 characters long",
+				"Game started! Type words that are at least 4 characters long. Each word can only be used once!",
 				{ position: "top-center" }
 			);
 
