@@ -13,7 +13,6 @@ import GameHeader from "@/components/games/game-header";
 import words from "an-array-of-english-words";
 import dynamic from "next/dynamic";
 
-// Dynamically import Keyboard with no SSR to avoid hydration issues
 const Keyboard = dynamic(() => import("react-simple-keyboard"), {
 	ssr: false,
 	loading: () => null,

@@ -1,21 +1,13 @@
 import React from "react";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-	CardFooter,
-} from "@/components/ui/card";
-import { ArrowLeft, Gamepad2, Users, Trophy, PlayCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
 import { Game, games } from "@/lib/data/games";
 import { pools } from "@/app/lobby/page";
 import CreatePoolForm from "@/components/lobby/create-lobby-form";
-
-// Dummy pools data - in real app this would come from an API
+import GameDetails from "@/components/games/game-details";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SinglePlayer from "@/components/games/single-player";
 
 export default function CreateGame() {
 	const game: Game = games[0];
@@ -33,75 +25,36 @@ export default function CreateGame() {
 					</Link>
 
 					<div className="space-y-6 sm:space-y-8">
-						{/* Game Details */}
-						<Card>
-							<CardHeader>
-								<div className="flex items-center gap-3">
-									<div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-										<Gamepad2 className="h-6 w-6 text-primary" />
-									</div>
-									<div>
-										<CardTitle className="text-2xl">
-											{game.name}
-										</CardTitle>
-										<div className="flex gap-2 mt-2">
-											{game.type.map((type) => (
-												<Badge
-													key={type}
-													variant="secondary"
-												>
-													{type}
-												</Badge>
-											))}
-										</div>
-									</div>
-								</div>
-							</CardHeader>
-							<CardContent>
-								<p className="text-muted-foreground mb-4">
-									{game.description}
-								</p>
-								<div className="grid grid-cols-2 gap-4">
-									<div className="flex items-center gap-2">
-										<Trophy className="h-4 w-4 text-primary" />
-										<span className="text-sm text-muted-foreground">
-											Total Prize Pool:
-										</span>
-										<span className="font-medium">
-											{game.totalPrize} STX
-										</span>
-									</div>
-									<div className="flex items-center gap-2">
-										<Users className="h-4 w-4 text-primary" />
-										<span className="text-sm text-muted-foreground">
-											Active Pools:
-										</span>
-										<span className="font-medium">
-											{game.activePools}
-										</span>
-									</div>
-								</div>
-							</CardContent>
-							<CardFooter>
-								<Button className="w-full" size="lg" asChild>
-									<Link href={`/games/${game.id}/play`}>
-										<PlayCircle className="mr-2 h-5 w-5" />
-										Play Now
-									</Link>
-								</Button>
-							</CardFooter>
-						</Card>
+						<GameDetails game={game} />
 
-						{/* Create Lobby Form */}
-						<CreatePoolForm games={games} />
+						<Tabs defaultValue="multiplayer" className="w-full">
+							<TabsList className="grid w-full grid-cols-2">
+								<TabsTrigger value="multiplayer">
+									Multiplayer
+								</TabsTrigger>
+								<TabsTrigger value="singleplayer">
+									Singleplayer
+								</TabsTrigger>
+							</TabsList>
 
-						{/* Active Lobbies */}
-						<div className="space-y-4">
-							<h2 className="text-2xl font-bold tracking-tighter sm:text-3xl">
-								Active Lobbies
-							</h2>
-							<ActiveLobbies pools={pools} />
-						</div>
+							<TabsContent
+								value="multiplayer"
+								className="space-y-6"
+							>
+								<CreatePoolForm games={games} />
+
+								<div className="space-y-4">
+									<h2 className="text-2xl font-bold tracking-tighter sm:text-3xl">
+										Active Lobbies
+									</h2>
+									<ActiveLobbies pools={pools} />
+								</div>
+							</TabsContent>
+
+							<TabsContent value="singleplayer">
+								<SinglePlayer game={game} />
+							</TabsContent>
+						</Tabs>
 					</div>
 				</div>
 			</main>
