@@ -17,17 +17,13 @@ export default function Community() {
 					</Link>
 				</Button>
 				<Button asChild size="lg">
-					<Link
-						href="https://t.me"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
+					<Link href="" rel="noopener noreferrer">
 						<PiTelegramLogo />
 						Telegram
 					</Link>
 				</Button>
 				<Button asChild size="lg">
-					<Link href="" target="_blank" rel="noopener noreferrer">
+					<Link href="" rel="noopener noreferrer">
 						<RxDiscordLogo />
 						Discord
 					</Link>
