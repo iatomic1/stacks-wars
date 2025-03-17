@@ -16,8 +16,6 @@ Stacks Wars is a **gaming utility platform** built on the **Stacks blockchain**,
 -   **Frontend:** Next.js, React, Tailwind CSS
 -   **Backend:** Node.js (Planned for backend logic)
 -   **Smart Contracts:** Clarity (for on-chain interactions)
--   **Game Logic:** AWS Bedrock (Lexi War AI), IndexedDB (local storage for game state)
--   **APIs:** Wordnik API for word validation
 -   **Hosting:** Vercel
 
 ## Installation & Setup
@@ -25,10 +23,10 @@ Stacks Wars is a **gaming utility platform** built on the **Stacks blockchain**,
 To set up the project locally:
 
 ```sh
-git clone https://github.com/yourusername/stacks-wars.git
+git clone https://github.com/iatomic1/stacks-wars
 cd stacks-wars
-npm install
-npm run dev
+bun install
+bun dev
 ```
 
 ## How to Play (Lexi War)
