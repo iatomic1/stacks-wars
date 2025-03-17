@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import siteConfig from "@/config/site";
-import ConnectWallet from "./connect-wallet";
+//import ConnectWallet from "./connect-wallet";
 
 export default function SiteHeader() {
 	const navLinks = [
@@ -27,7 +27,7 @@ export default function SiteHeader() {
 				<Link href={"/"}>
 					<div className="flex items-center gap-2">
 						<Image
-							src="/stacks-wars.webp?height=32&width=32"
+							src="/logo.png?height=32&width=32"
 							alt="Stacks Wars Logo"
 							width={32}
 							height={32}
@@ -75,14 +75,14 @@ export default function SiteHeader() {
 										{link.label}
 									</Link>
 								))}
-								<ConnectWallet />
+								{/*<ConnectWallet />*/}
 							</nav>
 						</SheetContent>
 					</Sheet>
 				</div>
-				<div className="hidden md:flex">
+				{/*<div className="hidden md:flex">
 					<ConnectWallet />
-				</div>
+				</div>*/}
 			</div>
 		</header>
 	);

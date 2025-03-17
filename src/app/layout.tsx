@@ -59,7 +59,7 @@ export const metadata: Metadata = {
 			"Join the next generation of competitive gaming. Compete in various blockchain-powered games, participate in tournaments, and win STX rewards on the Stacks blockchain.",
 		images: [
 			{
-				url: "https://stackswars.com/og-image.webp?height=1200&width=630",
+				url: "https://stackswars.com/logo.png?height=1200&width=630",
 				width: 1200,
 				height: 630,
 				alt: "Stacks Wars - Web3 Gaming Platform",
@@ -72,26 +72,24 @@ export const metadata: Metadata = {
 		description:
 			"Discover a new era of competitive gaming on the Stacks blockchain. Multiple games, exciting tournaments, and STX rewards await.",
 		creator: "@stackswars",
-		images: [
-			"https://stackswars.com/twitter-image.webp?height=1200&width=630",
-		],
+		images: ["https://stackswars.com/logo.png?height=1200&width=630"],
 	},
 	icons: {
 		icon: [
 			{ url: "/favicon.ico" },
-			{ url: "/icon.webp?height=32&width=32", type: "image/webp" },
+			{ url: "/logo.png?height=32&width=32", type: "image/png" },
 		],
 		apple: [
-			{ url: "/icon.webp" },
+			{ url: "/logo.png" },
 			{
-				url: "/icon.webp?height=72&width=72",
+				url: "/logo.png?height=72&width=72",
 				sizes: "72x72",
-				type: "image/webp",
+				type: "image/png",
 			},
 			{
-				url: "/icon.webp?height=114&width=114",
+				url: "/logo.png?height=114&width=114",
 				sizes: "114x114",
-				type: "image/webp",
+				type: "image/png",
 			},
 		],
 	},
