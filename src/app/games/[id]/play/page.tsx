@@ -11,21 +11,39 @@ import GameRule from "@/components/games/game-rule";
 import GameTimer from "@/components/games/game-timer";
 import GameHeader from "@/components/games/game-header";
 import words from "an-array-of-english-words";
+import dynamic from "next/dynamic";
+
+// Dynamically import Keyboard with no SSR to avoid hydration issues
+const Keyboard = dynamic(() => import("react-simple-keyboard"), {
+	ssr: false,
+	loading: () => null,
+});
+
+import "react-simple-keyboard/build/css/index.css";
 
 export default function LexiWar() {
 	const [word, setWord] = useState("");
 	const [timeLeft, setTimeLeft] = useState(10);
 	const [score, setScore] = useState(0);
 	const [isPlaying, setIsPlaying] = useState(false);
+	const [isMobile, setIsMobile] = useState(false);
 	const gameStateRef = useRef({ isTimeUp: false, isStarted: false });
+	const keyboardRef = useRef(null);
 
-	// Prevent paste
+	// Detect mobile device
+	useEffect(() => {
+		setIsMobile(
+			/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+				navigator.userAgent
+			)
+		);
+	}, []);
+
 	const handlePaste = (e: React.ClipboardEvent) => {
 		e.preventDefault();
 		toast.error("Pasting is not allowed!", { position: "top-center" });
 	};
 
-	// Prevent copy
 	const handleCopy = (e: React.ClipboardEvent) => {
 		e.preventDefault();
 	};
@@ -46,23 +64,26 @@ export default function LexiWar() {
 
 	const isValidWord = (word: string) => words.includes(word.toLowerCase());
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
+	const handleSubmit = (e?: React.FormEvent) => {
+		e?.preventDefault();
 		if (!isPlaying) return;
 
-		if (word.length < 4) {
+		// Remove all spaces from the word before validation
+		const cleanWord = word.replace(/\s+/g, "");
+
+		if (cleanWord.length < 4) {
 			toast.error("Word must be at least 4 characters!", {
 				position: "top-center",
 			});
 			return;
 		}
 
-		if (!isValidWord(word)) {
+		if (!isValidWord(cleanWord)) {
 			toast.error("Invalid word! Try again.", { position: "top-center" });
 			return;
 		}
 
-		const points = word.length;
+		const points = cleanWord.length;
 		setScore((prev) => prev + points);
 		setWord("");
 		toast.success(`Valid word! +${points} points`, {
@@ -87,6 +108,19 @@ export default function LexiWar() {
 			setTimeout(() => {
 				gameStateRef.current.isStarted = false;
 			}, 100);
+		}
+	};
+
+	const handleKeyboardInput = (input: string) => {
+		if (input === "{enter}") {
+			handleSubmit();
+		} else if (input === "{bksp}") {
+			setWord((prev) => prev.slice(0, -1));
+		} else if (input === "{space}") {
+			// Ignore space
+			return;
+		} else {
+			setWord((prev) => (prev + input).toLowerCase());
 		}
 	};
 
@@ -123,6 +157,7 @@ export default function LexiWar() {
 									</CardTitle>
 								</div>
 							</CardHeader>
+
 							<CardContent>
 								<form
 									onSubmit={handleSubmit}
@@ -148,12 +183,15 @@ export default function LexiWar() {
 										disabled={!isPlaying || timeLeft === 0}
 										className="text-lg select-none"
 										tabIndex={-1}
-										autoFocus
+										autoFocus={!isMobile}
 										autoComplete="off"
 										aria-hidden="true"
 										autoCorrect="off"
 										spellCheck="false"
-										inputMode="text"
+										autoCapitalize="off"
+										inputMode="none"
+										aria-autocomplete="none"
+										readOnly={isMobile}
 									/>
 									<div className="flex justify-end">
 										<Button
@@ -173,6 +211,30 @@ export default function LexiWar() {
 							</CardContent>
 						</Card>
 					</div>
+
+					{isMobile && isPlaying && (
+						<div className="keyboard">
+							<Keyboard
+								keyboardRef={(r) => (keyboardRef.current = r)}
+								layoutName="default"
+								layout={{
+									default: [
+										"q w e r t y u i o p",
+										"a s d f g h j k l",
+										"z x c v b n m {bksp}",
+										"{enter}",
+									],
+								}}
+								display={{
+									"{bksp}": "⌫",
+									"{enter}": "Enter",
+								}}
+								onKeyPress={handleKeyboardInput}
+								disableButtonHold
+								physicalKeyboardHighlight={false}
+							/>
+						</div>
+					)}
 
 					<div className="sr-only" role="alert">
 						This is a competitive typing game that requires manual
