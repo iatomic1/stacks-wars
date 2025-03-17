@@ -126,6 +126,7 @@ export default function LexiWar() {
 							<CardContent>
 								<form
 									onSubmit={handleSubmit}
+									autoComplete="off"
 									className="space-y-4"
 								>
 									<Input
@@ -146,10 +147,13 @@ export default function LexiWar() {
 										onCut={handleCopy}
 										disabled={!isPlaying || timeLeft === 0}
 										className="text-lg select-none"
-										autoComplete="off"
-										autoFocus
-										aria-hidden="true"
 										tabIndex={-1}
+										autoFocus
+										autoComplete="off"
+										aria-hidden="true"
+										autoCorrect="off"
+										spellCheck="false"
+										inputMode="text"
 									/>
 									<div className="flex justify-end">
 										<Button

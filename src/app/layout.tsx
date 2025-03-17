@@ -89,9 +89,9 @@ export const metadata: Metadata = {
 				type: "image/webp",
 			},
 			{
-				url: "/apple-icon-114x114.png",
+				url: "/icon.webp?height=114&width=114",
 				sizes: "114x114",
-				type: "image/png",
+				type: "image/webp",
 			},
 		],
 	},
