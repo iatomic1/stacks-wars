@@ -27,7 +27,10 @@ export default function LexiWar() {
 	const [ruleRepeatCount, setRuleRepeatCount] = useState(0);
 	const [requiredRepeats, setRequiredRepeats] = useState(2);
 	const [randomLetter, setRandomLetter] = useState("a");
-	const [randomLength, setRandomLength] = useState(4);
+	const [minWordLength, setMinWordLength] = useState<number>(4);
+	const [gameRules, setGameRules] = useState(() =>
+		rules(minWordLength, randomLetter)
+	);
 
 	// Detect mobile device
 	useEffect(() => {
@@ -38,6 +41,19 @@ export default function LexiWar() {
 		);
 	}, []);
 
+	// Update rules when minWordLength or randomLetter changes
+	useEffect(() => {
+		setGameRules(rules(minWordLength, randomLetter));
+	}, [minWordLength, randomLetter]);
+
+	// Generate new random values when rule changes
+	useEffect(() => {
+		setRandomLetter(
+			"abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)]
+		);
+	}, [currentRuleIndex, ruleRepeatCount, minWordLength]);
+
+	// Timer and high score update
 	useEffect(() => {
 		let timer: NodeJS.Timeout;
 		if (isPlaying && timeLeft > 0) {
@@ -62,7 +78,6 @@ export default function LexiWar() {
 							`New High Score! 🎉\nPrevious: ${highScore}\nNew: ${score}\nImprovement: +${improvement}`,
 							{
 								position: "top-center",
-								duration: 3000,
 							}
 						);
 					});
@@ -85,13 +100,45 @@ export default function LexiWar() {
 		return words.includes(cleanWord);
 	}, []);
 
-	// Generate new random values when rule changes
-	useEffect(() => {
-		setRandomLetter(
-			"abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)]
-		);
-		setRandomLength(Math.floor(Math.random() * 6) + 4);
-	}, [currentRuleIndex, ruleRepeatCount]);
+	const validateWord = (word: string) => {
+		if (word.length < minWordLength) {
+			toast.error(
+				`Word must be at least ${minWordLength} characters long!`,
+				{
+					position: "top-center",
+				}
+			);
+			setWord("");
+			return false;
+		}
+
+		if (usedWords.has(word)) {
+			toast.error("You've already used this word!", {
+				position: "top-center",
+			});
+			setWord("");
+			return false;
+		}
+
+		if (!isValidWord(word)) {
+			toast.error("Invalid word! Try again.", {
+				position: "top-center",
+			});
+			setWord("");
+			return false;
+		}
+
+		// Get current rule
+		const currentRule = gameRules[currentRuleIndex];
+
+		// Validate against current rule
+		if (currentRuleIndex !== 0 && !currentRule.validator(word)) {
+			setWord("");
+			return false;
+		}
+
+		return true;
+	};
 
 	const handleSubmit = (e?: React.FormEvent) => {
 		e?.preventDefault();
@@ -99,41 +146,7 @@ export default function LexiWar() {
 
 		const cleanWord = normalizeWord(word);
 
-		if (usedWords.has(cleanWord)) {
-			toast.error("You've already used this word!", {
-				position: "top-center",
-			});
-			setWord("");
-			return;
-		}
-
-		if (!isValidWord(cleanWord)) {
-			toast.error("Invalid word! Try again.", { position: "top-center" });
-			setWord("");
-			return;
-		}
-
-		if (!rules[0].validator(cleanWord)) {
-			setWord("");
-			return;
-		}
-
-		// Get current rule
-		const currentRule = rules[currentRuleIndex];
-
-		// Validate against current rule
-		if (
-			currentRuleIndex !== 0 &&
-			!currentRule.validator(
-				cleanWord,
-				currentRule.rule.includes("random letter")
-					? randomLetter
-					: randomLength
-			)
-		) {
-			setWord("");
-			return;
-		}
+		if (!validateWord(cleanWord)) return;
 
 		// Word is valid, update game state
 		setUsedWords((prev) => new Set(prev).add(cleanWord));
@@ -146,21 +159,24 @@ export default function LexiWar() {
 			const newCount = prev + 1;
 			if (newCount >= requiredRepeats) {
 				// Move to next rule
-				const nextRuleIndex = (currentRuleIndex + 1) % rules.length;
+				const nextRuleIndex = (currentRuleIndex + 1) % gameRules.length;
 				setCurrentRuleIndex(nextRuleIndex);
 
-				// Calculate next required repeats
-				if (requiredRepeats === 4) {
-					setRequiredRepeats(2); // Reset to 2 if we hit 4
-				} else {
-					setRequiredRepeats((prev) => prev + 1); // Increment repeats
+				// If we're completing a full cycle
+				if (nextRuleIndex === 0) {
+					const newMinLength = minWordLength + 2;
+					setMinWordLength(newMinLength); // Increase minimum word length by 2
+					toast.success(
+						`Difficulty increased! Minimum word length is now ${newMinLength}!`,
+						{
+							position: "top-center",
+						}
+					);
 				}
 
-				// Announce level up
-				toast.success(`Level Up! New challenge unlocked!`, {
-					position: "top-center",
-					duration: 3000,
-				});
+				// Randomize next required repeats between 2 and 4
+				const randomRepeats = Math.floor(Math.random() * 3) + 2;
+				setRequiredRepeats(randomRepeats);
 
 				return 0; // Reset repeat count
 			}
@@ -240,18 +256,7 @@ export default function LexiWar() {
 
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<GameRule
-								currentRule={
-									rules[currentRuleIndex].getRule
-										? rules[currentRuleIndex].getRule(
-												rules[
-													currentRuleIndex
-												].rule.includes("random letter")
-													? randomLetter
-													: randomLength
-										  )
-										: rules[currentRuleIndex].rule
-								}
-								currentRuleIndex={currentRuleIndex}
+								currentRule={gameRules[currentRuleIndex].rule}
 								repeatCount={ruleRepeatCount}
 								requiredRepeats={requiredRepeats}
 							/>
