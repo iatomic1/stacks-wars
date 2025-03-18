@@ -20,7 +20,7 @@ interface JoinPoolFormProps {
 	isUserConnected?: boolean;
 }
 
-export default function JoinPoolForm({
+export default function JoinLobbyForm({
 	amount,
 	maxPlayers = 20,
 	currentPlayers = 0,
@@ -39,17 +39,15 @@ export default function JoinPoolForm({
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Join Pool</CardTitle>
+				<CardTitle>Join Lobby</CardTitle>
 				<CardDescription>
-					Join this pool to participate in the game
+					Join this lobby to participate in the game
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<div className="space-y-4">
-					<div>
-						<p className="text-sm font-medium mb-1">Entry Fee</p>
-						<p className="text-2xl font-bold">{amount} STX</p>
-					</div>
+					<p className="text-sm font-medium mb-1">Entry Fee</p>
+					<p className="text-2xl font-bold">{amount} STX</p>
 				</div>
 			</CardContent>
 			<CardFooter>

@@ -17,7 +17,7 @@ export default function SiteHeader() {
 	const navLinks = [
 		{ href: "/", label: "Home" },
 		{ href: "/games", label: "Games" },
-		//{ href: "/lobby", label: "Lobby" },
+		{ href: "/lobby", label: "Lobby" },
 		{ href: "/leaderboard", label: "Leaderboard" },
 	];
 
