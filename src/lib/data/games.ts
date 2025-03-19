@@ -14,10 +14,10 @@ export const games: Game[] = [
 		name: "Lexi War",
 		description:
 			"Challenge players in our word-rule game and compete for STX rewards",
-		type: ["Singleplayer", "Strategy"],
+		type: ["Word Game", "Strategy"],
 		totalPrize: 0,
 		activePools: 5,
-		image: "/placeholder.svg",
+		image: "/lexi-wars.webp",
 	},
 	//{
 	//	id: "2",

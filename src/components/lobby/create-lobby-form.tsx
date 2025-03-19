@@ -10,19 +10,13 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { Loader } from "lucide-react";
 import Link from "next/link";
 import { Game } from "@/lib/data/games";
 import { toast } from "sonner";
+//import { useState } from "react";
 
 interface CreateLobbyFormProps {
 	games: Game[];
@@ -33,11 +27,15 @@ export default function CreateLobbyForm({
 	games,
 	isLoading = false,
 }: CreateLobbyFormProps) {
+	//const [withPool, setWithPool] = useState(false);
+	const withPool = false;
+
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		toast.info("Lobby creation is coming soon!", {
-			position: "top-center",
+			position: "bottom-right",
 		});
+		console.log(games[0]);
 	};
 
 	return (
@@ -49,82 +47,23 @@ export default function CreateLobbyForm({
 				</CardDescription>
 			</CardHeader>
 			<form onSubmit={handleSubmit}>
-				<CardContent className="space-y-3">
+				<CardContent className="space-y-4">
 					<div className="space-y-2">
-						<Label htmlFor="name">Lobby Name</Label>
+						<Label
+							htmlFor="name"
+							className="inline-flex items-center gap-1"
+						>
+							Lobby Name
+							<span className="text-destructive">*</span>
+						</Label>
 						<Input
 							id="name"
 							name="name"
-							placeholder="Enter pool name"
-							disabled
+							placeholder="Enter lobby name"
+							required
 						/>
 						<p className="text-sm text-muted-foreground">
-							Give your pool a descriptive name
-						</p>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="amount">Pool Amount (STX)</Label>
-						<Input
-							id="amount"
-							name="amount"
-							type="number"
-							placeholder="Enter amount in STX"
-							defaultValue="100"
-							disabled
-						/>
-						<p className="text-sm text-muted-foreground">
-							This is the initial amount you&apos;ll contribute to
-							the pool
-						</p>
-					</div>
-
-					<div className="space-y-2">
-						<Label>
-							Maximum Players: <span id="maxPlayersValue">4</span>
-						</Label>
-						<div className="pt-2">
-							<Slider
-								name="maxPlayers"
-								min={2}
-								max={12}
-								step={1}
-								defaultValue={[4]}
-								disabled
-								onValueChange={(values) => {
-									const value = values[0];
-									document.getElementById(
-										"maxPlayersValue"
-									)!.textContent = value.toString();
-								}}
-							/>
-						</div>
-						<p className="text-sm text-muted-foreground">
-							Select the maximum number of players (2-12) that can
-							join this pool
-						</p>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="gameId">Game Type</Label>
-						<Select
-							name="gameId"
-							defaultValue={games[0]?.id}
-							disabled
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Select a game" />
-							</SelectTrigger>
-							<SelectContent>
-								{games.map((game) => (
-									<SelectItem value={game.id} key={game.id}>
-										{game.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-						<p className="text-sm text-muted-foreground">
-							Choose which game will be played in this pool
+							Give your lobby a descriptive name
 						</p>
 					</div>
 
@@ -133,13 +72,56 @@ export default function CreateLobbyForm({
 						<Input
 							id="description"
 							name="description"
-							placeholder="Enter pool description"
-							disabled
+							placeholder="Enter lobby description"
 						/>
 						<p className="text-sm text-muted-foreground">
-							Provide additional details about your pool
+							Provide additional details about your lobby
 						</p>
 					</div>
+
+					<div className="flex items-center space-x-2">
+						<Switch
+							id="pool-mode"
+							checked={withPool}
+							onCheckedChange={() => {
+								toast.info(
+									"Lobby creation with pool is coming soon!",
+									{
+										position: "bottom-right",
+									}
+								);
+							}}
+						/>
+						<Label htmlFor="pool-mode">
+							Create lobby with pool
+						</Label>
+					</div>
+
+					{withPool && (
+						<div className="space-y-2">
+							<Label
+								htmlFor="amount"
+								className="inline-flex items-center gap-1"
+							>
+								Pool Amount (STX)
+								<span className="text-destructive">*</span>
+							</Label>
+							<Input
+								id="amount"
+								name="amount"
+								type="number"
+								placeholder="Enter amount in STX"
+								defaultValue="100"
+								required={withPool}
+								min="1"
+							/>
+							<p className="text-sm text-muted-foreground">
+								This is the initial amount you&apos;ll
+								contribute to the pool and entry fee for other
+								players
+							</p>
+						</div>
+					)}
 				</CardContent>
 				<CardFooter className="flex justify-between">
 					<Button variant="outline" asChild>

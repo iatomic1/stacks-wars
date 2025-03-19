@@ -2,7 +2,17 @@ import React from "react";
 import { Card, CardHeader, CardTitle } from "../ui/card";
 import { User } from "lucide-react";
 
-export default function GameRule() {
+interface GameRuleProps {
+	currentRule: string;
+	repeatCount: number;
+	requiredRepeats: number;
+}
+
+export default function GameRule({
+	currentRule,
+	repeatCount,
+	requiredRepeats,
+}: GameRuleProps) {
 	return (
 		<Card className="bg-primary/5 border-primary/10">
 			<CardHeader className="pb-3">
@@ -12,10 +22,10 @@ export default function GameRule() {
 					</div>
 					<div>
 						<CardTitle className="text-sm text-primary">
-							Current Rule
+							Current Rule ({repeatCount}/{requiredRepeats})
 						</CardTitle>
 						<p className="text-sm font-medium mt-1">
-							Type words that are at least 4 characters long
+							{currentRule}
 						</p>
 					</div>
 				</div>
