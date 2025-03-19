@@ -91,8 +91,8 @@ export default function ActiveLobbies({ pools }: { pools: POOL[] }) {
 								}`}
 							>
 								{pool.status === "open"
-									? "Join Pool"
-									: "Pool Full"}
+									? "Join Lobby"
+									: "Lobby Full"}
 								{pool.status === "open" && (
 									<ArrowRight className="h-4 w-4" />
 								)}

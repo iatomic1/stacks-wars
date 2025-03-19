@@ -15,12 +15,21 @@ import ConnectWallet from "./connect-wallet";
 //import ConnectWallet from "./connect-wallet";
 
 export default function SiteHeader() {
+<<<<<<< HEAD
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/games", label: "Games" },
     //{ href: "/lobby", label: "Lobby" },
     { href: "/leaderboard", label: "Leaderboard" },
   ];
+=======
+	const navLinks = [
+		{ href: "/", label: "Home" },
+		{ href: "/games", label: "Games" },
+		{ href: "/lobby", label: "Lobby" },
+		{ href: "/leaderboard", label: "Leaderboard" },
+	];
+>>>>>>> 602b1e973000c724cd34c32caed139fd7ca6e3c1
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
