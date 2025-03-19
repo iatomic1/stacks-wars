@@ -15,8 +15,9 @@ import { Switch } from "@/components/ui/switch";
 import { Loader } from "lucide-react";
 import Link from "next/link";
 import { Game } from "@/lib/data/games";
-import { toast } from "sonner";
-//import { useState } from "react";
+//import { toast } from "sonner";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface CreateLobbyFormProps {
 	games: Game[];
@@ -27,14 +28,12 @@ export default function CreateLobbyForm({
 	games,
 	isLoading = false,
 }: CreateLobbyFormProps) {
-	//const [withPool, setWithPool] = useState(false);
-	const withPool = false;
+	const [withPool, setWithPool] = useState(false);
+	const router = useRouter();
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		toast.info("Lobby creation is coming soon!", {
-			position: "bottom-right",
-		});
+		router.push("/lobby/1");
 		console.log(games[0]);
 	};
 
@@ -84,12 +83,7 @@ export default function CreateLobbyForm({
 							id="pool-mode"
 							checked={withPool}
 							onCheckedChange={() => {
-								toast.info(
-									"Lobby creation with pool is coming soon!",
-									{
-										position: "bottom-right",
-									}
-								);
+								setWithPool(!withPool);
 							}}
 						/>
 						<Label htmlFor="pool-mode">
