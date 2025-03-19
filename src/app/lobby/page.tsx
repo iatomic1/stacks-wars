@@ -100,6 +100,12 @@ export default async function PoolsPage() {
 								</Button>
 							</Link>
 						</div>
+						<div className="mt-6 p-4 bg-yellow-500/10 border-2 border-yellow-500/20 rounded-lg">
+							<p className="text-yellow-500 text-sm font-medium flex items-center gap-2">
+								🚧 This feature is currently under development.
+								Check back soon for updates!
+							</p>
+						</div>
 						<div className="grid gap-6 pt-8 md:grid-cols-2 lg:grid-cols-3">
 							<ActiveLobbies pools={pools} />
 						</div>

@@ -10,7 +10,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Loader } from "lucide-react";
-//import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface JoinPoolFormProps {
 	amount: number;
@@ -27,13 +27,14 @@ export default function JoinLobbyForm({
 	isUserJoined = false,
 	isUserConnected = true,
 }: JoinPoolFormProps) {
-	//const router = useRouter();
+	const router = useRouter();
 	const isLoading = false;
 	const isFull = currentPlayers >= maxPlayers;
 
 	const handleSubmit = () => {
 		console.log("Joining pool...");
 		// Here you can add any additional logic needed when joining the pool
+		router.push(`/lobby/1/play`);
 	};
 
 	return (
@@ -71,7 +72,7 @@ export default function JoinLobbyForm({
 					) : isFull ? (
 						"Pool is Full"
 					) : (
-						"Join Pool"
+						"Join Lobby"
 					)}
 				</Button>
 			</CardFooter>
