@@ -3,75 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 //import { getAllPools } from "@/lib/services/pools";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
-
-export interface POOL {
-	id: number;
-	name: string;
-	status: string;
-	amount: number;
-	maxPlayers: number;
-	participants: { id: number; stxAddress: string }[];
-	creator: { id: number; stxAddress: string };
-	game: { id: number; name: string };
-}
-
-export const pools: POOL[] = [
-	{
-		id: 1,
-		name: "Lexi War",
-		status: "full",
-		amount: 100,
-		maxPlayers: 2,
-		participants: [
-			{
-				id: 1,
-				stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
-			},
-		],
-		creator: {
-			id: 1,
-			stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
-		},
-		game: { id: 1, name: "Lexi War" },
-	},
-	{
-		id: 1,
-		name: "Lexi War",
-		status: "open",
-		amount: 100,
-		maxPlayers: 2,
-		participants: [
-			{
-				id: 1,
-				stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
-			},
-		],
-		creator: {
-			id: 1,
-			stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
-		},
-		game: { id: 1, name: "Lexi War" },
-	},
-	{
-		id: 1,
-		name: "Lexi War",
-		status: "open",
-		amount: 100,
-		maxPlayers: 2,
-		participants: [
-			{
-				id: 1,
-				stxAddress:
-					"ST1PQHQKSP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00BV0Z1",
-			},
-		],
-		creator: {
-			id: 1,
-			stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
-		},
-		game: { id: 1, name: "Lexi War" },
-	},
-];
+import { pools } from "@/lib/data/lobby";
 
 export default async function PoolsPage() {
 	//const pools = await getAllPools();

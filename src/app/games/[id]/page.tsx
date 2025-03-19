@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
 import { Game, games } from "@/lib/data/games";
-import { pools } from "@/app/lobby/page";
+import { pools } from "@/lib/data/lobby";
 import CreatePoolForm from "@/components/lobby/create-lobby-form";
 import GameDetails from "@/components/games/game-details";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

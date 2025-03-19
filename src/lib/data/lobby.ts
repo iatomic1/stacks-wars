@@ -73,3 +73,72 @@ export const pool: Pool = {
 	txID: "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
 	createdAt: "2025-03-09T12:00:00Z",
 };
+
+export interface POOL {
+	id: number;
+	name: string;
+	status: string;
+	amount: number;
+	maxPlayers: number;
+	participants: { id: number; stxAddress: string }[];
+	creator: { id: number; stxAddress: string };
+	game: { id: number; name: string };
+}
+
+export const pools: POOL[] = [
+	{
+		id: 1,
+		name: "Lexi War",
+		status: "full",
+		amount: 100,
+		maxPlayers: 2,
+		participants: [
+			{
+				id: 1,
+				stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
+			},
+		],
+		creator: {
+			id: 1,
+			stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
+		},
+		game: { id: 1, name: "Lexi War" },
+	},
+	{
+		id: 1,
+		name: "Lexi War",
+		status: "open",
+		amount: 100,
+		maxPlayers: 2,
+		participants: [
+			{
+				id: 1,
+				stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
+			},
+		],
+		creator: {
+			id: 1,
+			stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
+		},
+		game: { id: 1, name: "Lexi War" },
+	},
+	{
+		id: 1,
+		name: "Lexi War",
+		status: "open",
+		amount: 100,
+		maxPlayers: 2,
+		participants: [
+			{
+				id: 1,
+				stxAddress:
+					"ST1PQHQKSP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00BV0Z1",
+			},
+		],
+		creator: {
+			id: 1,
+			stxAddress: "SP16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY3CVQ00B",
+		},
+		game: { id: 1, name: "Lexi War" },
+	},
+];
