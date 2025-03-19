@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Users } from "lucide-react";
 import { truncateAddress } from "@/lib/utils";
-import { POOL } from "@/app/lobby/page";
+import { POOL } from "@/lib/data/lobby";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
