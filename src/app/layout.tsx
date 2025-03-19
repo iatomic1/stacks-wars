@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import SiteFooter from "@/_components/site-footer";
-import SiteHeader from "@/_components/site-header";
+//import SiteHeader from "@/_components/site-header";
 import { WalletProvider } from "@/context/WalletContext";
 //import { UserProvider } from "@/context/UserContext";
 
@@ -113,7 +113,7 @@ export default function RootLayout({
 			>
 				<WalletProvider>
 					{/*<UserProvider>*/}
-					<SiteHeader />
+					{/*<SiteHeader />*/}
 					<Toaster richColors position="top-right" />
 					{children}
 					<SiteFooter />

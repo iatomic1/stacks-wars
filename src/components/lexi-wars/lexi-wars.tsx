@@ -266,11 +266,11 @@ export default function LexiWars({ oppsData }: LexiWarsProps) {
 					)}
 				>
 					<Link
-						href="/games"
+						href="/"
 						className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4 sm:mb-6"
 					>
 						<ArrowLeft className="h-4 w-4" />
-						<span>Back to Games</span>
+						<span>Back to Home page</span>
 					</Link>
 
 					<div className="space-y-4 select-none">
