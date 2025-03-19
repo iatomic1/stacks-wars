@@ -13,6 +13,7 @@ import { PlayCircle } from "lucide-react";
 import { Game } from "@/lib/data/games";
 
 export default function SinglePlayer({ game }: { game: Game }) {
+	console.log(game);
 	return (
 		<Card>
 			<CardHeader>
@@ -35,7 +36,7 @@ export default function SinglePlayer({ game }: { game: Game }) {
 			</CardContent>
 			<CardFooter className="flex justify-end">
 				<Button asChild>
-					<Link href={`/games/${game.id}/play`}>
+					<Link href={`/lexi-wars`}>
 						<PlayCircle className="mr-2 h-5 w-5" />
 						Play Now
 					</Link>

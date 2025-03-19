@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-//import { getAllPools } from "@/lib/services/pools";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
 import { getAvailableLobbies, getLobbies } from "@/lib/services/lobby";
 
@@ -72,7 +71,6 @@ export const pools: POOL[] = [
     game: { id: 1, name: "Lexi War" },
   },
 ];
-type Lobby = {};
 
 export default async function PoolsPage() {
   const lobbies = await getAvailableLobbies();
