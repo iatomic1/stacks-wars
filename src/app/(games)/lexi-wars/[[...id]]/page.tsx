@@ -12,11 +12,11 @@ export default async function LobbyPlayGround({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	console.log(id[0]);
+	if (id) console.log(id[0]);
 
 	let oppsData: PlayerScore[] = [];
 
-	if (id[0] === "1") {
+	if (id && id[0] === "1") {
 		oppsData = [
 			{ username: "You", score: 10, isCurrentPlayer: true },
 			{ username: "WordWeaver", score: 42 },
