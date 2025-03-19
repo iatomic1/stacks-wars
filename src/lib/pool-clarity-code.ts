@@ -1,4 +1,11 @@
-export const clarityCode = `;; Stacks Game Pool Contract
+export const getClarityCode = (
+  name: string,
+  players: number,
+  totalPrize: number,
+) => {
+  const amountPerPlayer = Math.floor(totalPrize / players);
+
+  return `;; Stacks Game Pool Contract
 ;; Each contract represents a single pool where players stake STX to play
 
 ;; Define constants for error codes
@@ -19,10 +26,10 @@ export const clarityCode = `;; Stacks Game Pool Contract
 
 ;; Define data variables
 (define-data-var contract-owner principal tx-sender)
-(define-data-var pool-name (string-ascii 50) "")
-(define-data-var max-players uint u0)
-(define-data-var prize-pool uint u0)
-(define-data-var amount-per-player uint u0)
+(define-data-var pool-name (string-ascii 50) "${name}")
+(define-data-var max-players uint u${players})
+(define-data-var prize-pool uint u${totalPrize})
+(define-data-var amount-per-player uint u${amountPerPlayer})
 (define-data-var current-player-count uint u0)
 (define-data-var total-staked uint u0)
 (define-data-var game-started bool false)
@@ -37,34 +44,6 @@ export const clarityCode = `;; Stacks Game Pool Contract
 (define-map player-indices
   { index: uint }
   { player: principal })
-
-;; Function to initialize pool parameters (only called once when contract deployed)
-(define-public (initialize-pool (name (string-ascii 50)) (players uint) (total-prize uint))
-  (begin
-    ;; Only contract owner can initialize
-    (asserts! (is-eq tx-sender (var-get contract-owner)) err-not-owner)
-    
-    ;; Validate input parameters
-    (asserts! (> (len name) u0) err-invalid-name)
-    (asserts! (> players u1) err-invalid-player-count)
-    (asserts! (> total-prize u0) err-invalid-prize-amount)
-    (asserts! (>= total-prize players) err-invalid-prize-amount)
-    
-    ;; Set pool parameters
-    (var-set pool-name name)
-    (var-set max-players players)
-    (var-set prize-pool total-prize)
-    
-    ;; Calculate amount each player needs to stake
-    ;; Protected against division by zero with the above assertion (players > 1)
-    (var-set amount-per-player (/ total-prize players))
-    
-    (ok {
-      name: name,
-      max-players: players,
-      prize-pool: total-prize,
-      amount-per-player: (var-get amount-per-player)
-    })))
 
 ;; Function for players to join the pool
 (define-public (join-pool)
@@ -90,44 +69,6 @@ export const clarityCode = `;; Stacks Game Pool Contract
       
       (ok (var-get current-player-count)))))
 
-;; Function to manually start the game (called by owner after pool is full)
-(define-public (start-game)
-  (begin
-    ;; Only contract owner can start the game
-    (asserts! (is-eq tx-sender (var-get contract-owner)) err-not-owner)
-    
-    ;; Check if the pool is full
-    (asserts! (is-eq (var-get current-player-count) (var-get max-players)) err-pool-not-full)
-    
-    ;; Set the game as started
-    (var-set game-started true)
-    
-    (ok true)))
-
-;; Function to determine the winner (called by owner after game is played)
-(define-public (determine-winner (winner-address principal))
-  (begin
-    ;; Only contract owner can determine winner
-    (asserts! (is-eq tx-sender (var-get contract-owner)) err-not-owner)
-    
-    ;; Check if the game has started
-    (asserts! (var-get game-started) err-game-not-started)
-    
-    ;; Check if the winner has already been set
-    (asserts! (is-none (var-get winner)) err-winner-already-set)
-    
-    ;; Check if the winner is a valid player
-    (asserts! (is-some (map-get? pool-players { player: winner-address })) err-not-a-player)
-    
-    ;; Set the winner
-    (var-set winner (some winner-address))
-    
-    ;; Transfer the total staked amount to the winner
-    (let ((transfer-result (as-contract (stx-transfer? (var-get total-staked) tx-sender winner-address))))
-      (asserts! (is-ok transfer-result) err-transfer-failed)
-      
-      (ok (var-get total-staked)))))
-
 ;; Read-only functions to get pool information
 (define-read-only (get-pool-info)
   {
@@ -152,3 +93,4 @@ export const clarityCode = `;; Stacks Game Pool Contract
     max: (var-get max-players),
     current: (var-get current-player-count)
   }))`;
+};
