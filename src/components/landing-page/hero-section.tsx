@@ -1,5 +1,4 @@
 import React from "react";
-import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import Link from "next/link";
@@ -19,24 +18,18 @@ export default function HeroSection() {
 					<div className="flex flex-col justify-center space-y-4">
 						<div className="space-y-2">
 							<h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-								Enter the Lobby. Compete. Conquer.
+								Try Out Our First Featured Game!
 							</h1>
 							<p className="max-w-[600px] text-muted-foreground md:text-xl">
-								Dive into high-stakes battles, outplay rivals,
-								and claim Stacks (STX) as your reward. The
-								warzone awaits!
+								Experience the thrill of Stacks Wars with our
+								first game. Dive in, test your skills, and claim
+								victory!
 							</p>
 						</div>
 						<div className="flex flex-col gap-2 min-[400px]:flex-row">
-							<Link href="/games">
+							<Link href="/lexi-wars">
 								<Button size="lg" className="gap-1.5">
-									Create a Match
-									<ArrowRight className="h-4 w-4" />
-								</Button>
-							</Link>
-							<Link href="/lobby">
-								<Button size="lg" variant="outline">
-									Join the Battle
+									Play Now
 								</Button>
 							</Link>
 						</div>
