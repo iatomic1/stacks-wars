@@ -56,7 +56,7 @@ export default function GameOverModal({
 						<div className="text-center flex flex-col items-center">
 							<p className="text-sm font-medium text-muted-foreground mb-1">
 								{isNewHighScore
-									? "Previous High Score"
+									? "Previous Best"
 									: "High Score"}
 							</p>
 							<div className="flex items-center gap-2 text-2xl font-bold">
