@@ -34,7 +34,7 @@ export default function JoinLobbyForm({
 	const handleSubmit = () => {
 		console.log("Joining pool...");
 		// Here you can add any additional logic needed when joining the pool
-		router.push(`/lobby/1/play`);
+		router.push(`/lexi-wars/1`);
 	};
 
 	return (

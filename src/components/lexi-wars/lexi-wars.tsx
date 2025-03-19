@@ -23,14 +23,10 @@ interface OppsData {
 }
 
 interface LexiWarsProps {
-	isMultiplayer?: boolean;
 	oppsData?: OppsData[];
 }
 
-export default function LexiWars({
-	isMultiplayer = false,
-	oppsData,
-}: LexiWarsProps) {
+export default function LexiWars({ oppsData }: LexiWarsProps) {
 	const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
 	const [word, setWord] = useState("");
 	const [timeLeft, setTimeLeft] = useState(10);
@@ -51,6 +47,7 @@ export default function LexiWars({
 	const [showGameOver, setShowGameOver] = useState(false);
 	const [isNewHighScore, setIsNewHighScore] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const [isMultiplayer, setIsMultiplayer] = useState(false);
 
 	// Detect mobile device
 	useEffect(() => {
@@ -59,7 +56,8 @@ export default function LexiWars({
 				navigator.userAgent
 			)
 		);
-	}, []);
+		setIsMultiplayer(Boolean(oppsData && oppsData.length > 0));
+	}, [oppsData]);
 
 	// Update rules when minWordLength or randomLetter changes
 	useEffect(() => {
