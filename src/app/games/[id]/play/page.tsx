@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import GameRule from "@/components/games/game-rule";
 import GameTimer from "@/components/games/game-timer";
 import GameHeader from "@/components/games/game-header";
+import GameOverModal from "@/components/games/game-over-modal";
 import words from "an-array-of-english-words";
 import { db } from "@/lib/db";
 import KeyboardComp from "@/components/games/keyboard-comp";
@@ -23,6 +24,7 @@ export default function LexiWar() {
 	const [isMobile, setIsMobile] = useState(false);
 	const gameStateRef = useRef({ isTimeUp: false, isStarted: false });
 	const [highScore, setHighScore] = useState(0);
+	const [previousHighScore, setPreviousHighScore] = useState(0);
 	const [currentRuleIndex, setCurrentRuleIndex] = useState(0);
 	const [ruleRepeatCount, setRuleRepeatCount] = useState(0);
 	const [requiredRepeats, setRequiredRepeats] = useState(2);
@@ -31,6 +33,8 @@ export default function LexiWar() {
 	const [gameRules, setGameRules] = useState(() =>
 		rules(minWordLength, randomLetter)
 	);
+	const [showGameOver, setShowGameOver] = useState(false);
+	const [isNewHighScore, setIsNewHighScore] = useState(false);
 
 	// Detect mobile device
 	useEffect(() => {
@@ -64,8 +68,10 @@ export default function LexiWar() {
 			setIsPlaying(false);
 			gameStateRef.current.isTimeUp = true;
 
-			if (score > highScore) {
-				const improvement = score - highScore;
+			const isNewRecord = score > highScore;
+			setIsNewHighScore(isNewRecord);
+
+			if (isNewRecord) {
 				db.singleplayerV1
 					.put({
 						id: 1,
@@ -73,19 +79,16 @@ export default function LexiWar() {
 						timestamp: new Date(),
 					})
 					.then(() => {
+						setPreviousHighScore(highScore);
 						setHighScore(score);
-						toast.success(
-							`New High Score! 🎉\nPrevious: ${highScore}\nNew: ${score}\nImprovement: +${improvement}`,
-							{
-								position: "top-center",
-							}
-						);
 					});
 			}
 
-			toast.info(`Time's up! Final Score: ${score}`, {
+			toast.info(`Time's up!`, {
 				position: "top-center",
 			});
+
+			setShowGameOver(true);
 			setWord("");
 		}
 		return () => clearInterval(timer);
@@ -235,6 +238,10 @@ export default function LexiWar() {
 		loadHighScore();
 	}, []);
 
+	const handleCloseGameOver = () => {
+		setShowGameOver(false);
+	};
+
 	return (
 		<div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
 			<main className="flex-1">
@@ -292,6 +299,15 @@ export default function LexiWar() {
 							handleKeyboardInput={handleKeyboardInput}
 						/>
 					)}
+
+					<GameOverModal
+						isOpen={showGameOver}
+						onClose={handleCloseGameOver}
+						score={score}
+						highScore={previousHighScore}
+						isNewHighScore={isNewHighScore}
+						onPlayAgain={startGame}
+					/>
 
 					<div className="sr-only" role="alert">
 						This is a competitive typing game that requires manual
