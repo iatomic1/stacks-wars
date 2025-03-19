@@ -6,14 +6,12 @@ interface GameRuleProps {
 	currentRule: string;
 	repeatCount: number;
 	requiredRepeats: number;
-	currentRuleIndex: number;
 }
 
 export default function GameRule({
 	currentRule,
 	repeatCount,
 	requiredRepeats,
-	currentRuleIndex,
 }: GameRuleProps) {
 	return (
 		<Card className="bg-primary/5 border-primary/10">
@@ -27,9 +25,7 @@ export default function GameRule({
 							Current Rule ({repeatCount}/{requiredRepeats})
 						</CardTitle>
 						<p className="text-sm font-medium mt-1">
-							{currentRule}{" "}
-							{currentRuleIndex !== 0 &&
-								"and at least 4 characters long"}
+							{currentRule}
 						</p>
 					</div>
 				</div>

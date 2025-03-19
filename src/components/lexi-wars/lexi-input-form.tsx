@@ -1,4 +1,3 @@
-import React, { useRef } from "react";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
@@ -11,6 +10,7 @@ interface LexiInputFormProps {
 	timeLeft: number;
 	isMobile: boolean;
 	startGame: () => void;
+	inputRef: React.RefObject<HTMLInputElement | null>;
 }
 
 export default function LexiInputForm({
@@ -21,9 +21,8 @@ export default function LexiInputForm({
 	timeLeft,
 	isMobile,
 	startGame,
+	inputRef,
 }: LexiInputFormProps) {
-	const inputRef = useRef<HTMLInputElement>(null);
-
 	const handlePaste = (e: React.ClipboardEvent) => {
 		e.preventDefault();
 		toast.error("Pasting is not allowed!", { position: "top-center" });
@@ -35,9 +34,6 @@ export default function LexiInputForm({
 
 	const handleStartGame = () => {
 		startGame();
-		setTimeout(() => {
-			inputRef.current?.focus();
-		}, 50); // Small delay to ensure state updates first
 	};
 
 	return (

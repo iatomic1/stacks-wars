@@ -106,7 +106,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} dark antialiased mx-auto`}
+				className={`${geistSans.variable} ${geistMono.variable} dark antialiased mx-auto custom-scrollbar`}
 			>
 				<WalletProvider>
 					{/*<UserProvider>*/}
