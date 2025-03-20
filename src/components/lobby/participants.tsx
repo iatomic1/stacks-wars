@@ -2,12 +2,12 @@ import React from "react";
 import { Card, CardContent, CardTitle, CardHeader } from "../ui/card";
 import { User, Users } from "lucide-react";
 import { Button } from "../ui/button";
-import { Pool } from "@/lib/data/lobby";
 import Link from "next/link";
+import { Lobby } from "@/types/lobbySchema";
 
 //const EXPLORER_BASE_URL = "https://explorer.stacks.co/";
 
-export default function Participants({ pool }: { pool: Pool }) {
+export default function Participants({ lobby }: { lobby: Lobby }) {
 	return (
 		<Card className="overflow-hidden">
 			<CardHeader className="bg-muted/30 p-4 pb-3 sm:p-6 sm:pb-4">
@@ -24,9 +24,9 @@ export default function Participants({ pool }: { pool: Pool }) {
 				</p>
 			</CardHeader>
 			<CardContent className="p-4 sm:p-6">
-				{pool.participants.length > 0 ? (
+				{lobby.participants.length > 0 ? (
 					<div className="space-y-2 sm:space-y-3">
-						{pool.participants.map((participant, index) => (
+						{lobby.participants.map((participant, index) => (
 							<div
 								key={index}
 								className="flex justify-between items-center p-2 sm:p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
@@ -38,7 +38,7 @@ export default function Participants({ pool }: { pool: Pool }) {
 									<div className="overflow-hidden">
 										<div className="flex items-center gap-2">
 											<p className="text-sm sm:text-base font-medium truncate max-w-[120px] xs:max-w-[160px] sm:max-w-[200px] md:max-w-[300px]">
-												{participant.user.username}
+												{participant.username}
 											</p>
 											<span
 												className={`text-xs px-2 py-0.5 rounded-full ${

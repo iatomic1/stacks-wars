@@ -1,12 +1,4 @@
-export interface Game {
-	id: string;
-	name: string;
-	description: string;
-	type: string[];
-	totalPrize: number;
-	activePools: number;
-	image: string;
-}
+import { Game } from "@/types/lobbySchema";
 
 export const games: Game[] = [
 	{
@@ -14,10 +6,12 @@ export const games: Game[] = [
 		name: "Lexi War",
 		description:
 			"Challenge players in our word-rule game and compete for STX rewards",
-		type: ["Word Game", "Strategy"],
-		totalPrize: 0,
-		activePools: 5,
+		tags: ["Word game", "Strategy"],
 		image: "/lexi-wars.webp",
+		activeLobbies: 10,
+		totalPrize: 0,
+		createdAt: "2025-03-09T12:00:00Z",
+		updatedAt: "2025-03-09T12:00:00Z",
 	},
 	//{
 	//	id: "2",
