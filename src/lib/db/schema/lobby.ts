@@ -2,19 +2,22 @@ import { integer, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 import { TIMESTAMP, UUID } from "./utils";
 import { users } from "./users";
 import { games } from "./games";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const lobby = pgTable("lobby", {
-  ...UUID,
-  ...TIMESTAMP,
-  name: varchar().notNull(),
-  creatorId: uuid().references(() => users.id),
-  gameId: uuid()
-    .references(() => games.id)
-    .notNull(),
-  maxPlayers: integer().notNull(),
-  status: varchar().default("created"),
-  description: text().notNull(),
+	...UUID,
+	...TIMESTAMP,
+	name: varchar({ length: 255 }).notNull(),
+	creatorId: uuid()
+		.references(() => users.id)
+		.notNull(),
+	gameId: uuid()
+		.references(() => games.id)
+		.notNull(),
+	maxPlayers: integer().notNull(),
+	status: varchar({ length: 50 }).notNull().default("pending"),
+	description: text(),
 });
 
-export const insertLobbySchema = createInsertSchema(lobby);
+export const lobbySelectSchema = createSelectSchema(lobby);
+export const lobbyInsertSchema = createInsertSchema(lobby);
