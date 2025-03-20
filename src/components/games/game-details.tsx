@@ -1,8 +1,8 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Game } from "@/lib/data/games";
 import { Gamepad2, Users, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Game } from "@/types/lobbySchema";
 
 export default function GameDetails({ game }: { game: Game }) {
 	return (
@@ -15,9 +15,9 @@ export default function GameDetails({ game }: { game: Game }) {
 					<div>
 						<CardTitle className="text-2xl">{game.name}</CardTitle>
 						<div className="flex gap-2 mt-2">
-							{game.type.map((type) => (
-								<Badge key={type} variant="secondary">
-									{type}
+							{game.tags.map((tag) => (
+								<Badge key={tag} variant="secondary">
+									{tag}
 								</Badge>
 							))}
 						</div>
@@ -41,7 +41,9 @@ export default function GameDetails({ game }: { game: Game }) {
 						<span className="text-sm text-muted-foreground">
 							Active Lobbies:
 						</span>
-						<span className="font-medium">{game.activePools}</span>
+						<span className="font-medium">
+							{game.activeLobbies}
+						</span>
 					</div>
 				</div>
 			</CardContent>

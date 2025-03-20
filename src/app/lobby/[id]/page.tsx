@@ -8,7 +8,7 @@ import JoinLobbyForm from "@/components/lobby/join-lobby-form";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 //import slugify from "react-slugify";
-import { pool } from "@/lib/data/lobby";
+import { lobbies } from "@/lib/data/lobbyData";
 import LobbyStats from "@/components/lobby/lobby-stats";
 import LobbyDetails from "@/components/lobby/lobby-details";
 import Participants from "@/components/lobby/participants";
@@ -25,12 +25,12 @@ export default async function PoolDetailPage({
 }: {
 	params: Promise<{ id: string }>;
 }) {
-	//const poolId = (await params).id;
+	const id = (await params).id;
 	//const pool = await getPoolById(poolId);
 	//const deployTx = await getTransaction(pool?.deployTxId);
 	//const initializeTx = await getTransaction(pool?.initializeTxId);
 
-	console.log(params);
+	console.log(id);
 
 	// Pool dummy data
 
@@ -53,7 +53,12 @@ export default async function PoolDetailPage({
 	//	anchor_mode: "any",
 	//};
 
-	if (!pool) {
+	if (!lobbies) {
+		notFound();
+	}
+	const lobby = lobbies.find((lobby) => lobby.id === id);
+
+	if (!lobby) {
 		notFound();
 	}
 
@@ -73,7 +78,7 @@ export default async function PoolDetailPage({
 					<div className="mb-6 sm:mb-8 space-y-2 sm:space-y-3">
 						<div className="flex flex-wrap items-start justify-between gap-2">
 							<h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight break-words">
-								{pool.name}
+								{lobby.name}
 							</h1>
 							{/*{deployTx?.tx_status === "success" &&
 								initializeTx?.tx_status !== "success" && (
@@ -94,7 +99,7 @@ export default async function PoolDetailPage({
 								)}*/}
 						</div>
 						<p className="text-sm sm:text-base text-muted-foreground max-w-3xl break-words">
-							{pool.description}
+							{lobby.description}
 						</p>
 					</div>
 
@@ -102,12 +107,12 @@ export default async function PoolDetailPage({
 						{/* Main Content */}
 						<div className="lg:col-span-2 space-y-4 sm:space-y-6 lg:space-y-8">
 							{/* Stats Cards */}
-							<LobbyStats pool={pool} />
+							<LobbyStats lobby={lobby} />
 
 							{/* Lobby Details */}
-							<LobbyDetails pool={pool} />
+							<LobbyDetails lobby={lobby} />
 
-							<Participants pool={pool} />
+							<Participants lobby={lobby} />
 						</div>
 
 						<div className="space-y-4 sm:space-y-6">
@@ -121,17 +126,17 @@ export default async function PoolDetailPage({
 								>
 									<JoinLobbyForm
 										amount={
-											Number.parseFloat(pool.amount) /
-											pool.maxPlayers
+											lobby.pool.currentAmount /
+											lobby.pool.maxPlayers
 										}
-										maxPlayers={pool.maxPlayers}
+										maxPlayers={lobby.maxPlayers}
 										currentPlayers={
-											pool.participants.length
+											lobby.participants.length
 										}
 									/>
 								</Suspense>
 
-								<GamePreview pool={pool} />
+								<GamePreview lobby={lobby} />
 							</div>
 						</div>
 					</div>
