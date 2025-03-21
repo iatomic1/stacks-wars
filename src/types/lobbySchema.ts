@@ -1,41 +1,47 @@
-interface Game {
+export interface Game {
   id: string;
   createdAt: string;
   updatedAt: string;
   name: string;
   description: string;
-  tags: string;
+  tags: string[];
   image: string | null;
   activeLobbies: number;
-  totalPrize: number;
+  totalPrize: string;
 }
 
-interface Pool {
+export interface Pool {
   id: string;
   createdAt: string;
   updatedAt: string;
   lobbyId: string;
   currentAmount: number;
-  amount: number;
+  targetAmount: number;
   maxPlayers: number;
+  entryAmount: number;
   contractId: string | null;
   deployContractTxId: string;
 }
 
-interface Participant {}
+interface Participant {
+  id: string;
+  stxAddress: string;
+  username: string;
+  ready: boolean;
+  amount: number;
+}
 
 export interface Lobby {
   id: string;
   createdAt: string;
   updatedAt: string;
   name: string;
-  creatorId: string | null;
+  creator: Participant;
   gameId: string;
   maxPlayers: number;
-  status: "created" | "active" | "completed" | "cancelled";
+  status: "pending" | "open" | "completed" | "cancelled";
   description: string;
   game: Game;
-  creator: null | any;
   pool: Pool;
   participants: Participant[];
 }

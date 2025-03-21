@@ -11,7 +11,7 @@ import { Trophy, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { Game } from "@/lib/data/games";
+import { Game } from "@/types/lobbySchema";
 
 export default function GameCard({ game }: { game: Game }) {
   return (
@@ -23,10 +23,10 @@ export default function GameCard({ game }: { game: Game }) {
               <div>
                 <CardTitle className="text-2xl">{game.name}</CardTitle>
                 <CardDescription className="mt-1">
-                  {game.type &&
-                    game.type.map((type) => (
-                      <Badge variant="outline" key={type} className="mr-2">
-                        {type}
+                  {game.tags &&
+                    game.tags.map((tag) => (
+                      <Badge variant="outline" key={tag} className="mr-2">
+                        {tag}
                       </Badge>
                     ))}
                 </CardDescription>
@@ -48,7 +48,7 @@ export default function GameCard({ game }: { game: Game }) {
                 <Users className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium">Active Lobbies</p>
-                  <p className="text-lg font-bold">{game.activePools}</p>
+                  <p className="text-lg font-bold">{game.activeLobbies}</p>
                 </div>
               </div>
             </div>
@@ -69,7 +69,7 @@ export default function GameCard({ game }: { game: Game }) {
         </div>
         <div className="relative hidden md:block">
           <Image
-            src={game.image || "/placeholder.svg"}
+            src={game.image || "/lexi-wars.webp"}
             alt={game.name}
             className="absolute inset-0 h-full w-full object-cover"
             width={300}
@@ -78,7 +78,7 @@ export default function GameCard({ game }: { game: Game }) {
         </div>
         <div className="md:hidden mt-4">
           <Image
-            src={game.image || "/placeholder.svg"}
+            src={game.image || "/lexi-wars.webp"}
             alt={game.name}
             className="w-full rounded-md object-cover"
             width={400}

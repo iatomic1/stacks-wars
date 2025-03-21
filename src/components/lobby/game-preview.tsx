@@ -9,9 +9,9 @@ import {
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { ChevronRight } from "lucide-react";
-import { Pool } from "@/lib/data/lobby";
+import { Lobby } from "@/types/lobbySchema";
 
-export default function GamePreview({ pool }: { pool: Pool }) {
+export default function GamePreview({ lobby }: { lobby: Lobby }) {
 	return (
 		<Card className="overflow-hidden">
 			<CardHeader className="p-4 pb-2 sm:p-6 sm:pb-3">
@@ -21,7 +21,10 @@ export default function GamePreview({ pool }: { pool: Pool }) {
 			</CardHeader>
 			<CardContent className="p-0">
 				<Image
-					src="/lexi-wars.webp?height=300&width=500"
+					src={
+						lobby.game.image ||
+						"/lexi-wars.webp?height=300&width=500"
+					}
 					width={500}
 					height={300}
 					alt="Game preview"
@@ -30,7 +33,7 @@ export default function GamePreview({ pool }: { pool: Pool }) {
 			</CardContent>
 			<CardFooter className="flex justify-between p-3 sm:p-4 bg-muted/30">
 				<p className="text-xs sm:text-sm font-medium">
-					{pool.game.name}
+					{lobby.game.name}
 				</p>
 				<Button
 					variant="ghost"

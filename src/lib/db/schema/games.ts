@@ -7,10 +7,10 @@ export const games = pgTable("games", {
   ...TIMESTAMP,
   name: varchar({ length: 255 }).notNull(),
   description: text().notNull(),
-  tags: text().notNull(),
+  tags: text("tags").array().notNull(),
   image: text(),
   activeLobbies: integer().notNull().default(0),
-  totalPrize: decimal().notNull().default("0"),
+  totalPrize: decimal({ precision: 10, scale: 2 }).notNull().default("0"),
 });
 
 export const gameSelectSchema = createSelectSchema(games);

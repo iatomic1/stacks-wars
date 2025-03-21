@@ -1,9 +1,9 @@
 import React from "react";
 import { Card, CardContent } from "../ui/card";
 import { Gamepad2, Trophy, Users } from "lucide-react";
-import { Pool } from "@/lib/data/lobby";
+import { Lobby } from "@/types/lobbySchema";
 
-export default function LobbyStats({ pool }: { pool: Pool }) {
+export default function LobbyStats({ lobby }: { lobby: Lobby }) {
 	return (
 		<div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
 			<Card className="bg-card/50 backdrop-blur-sm border-primary/10 hover:border-primary/20 transition-colors">
@@ -17,7 +17,7 @@ export default function LobbyStats({ pool }: { pool: Pool }) {
 								Pool Size
 							</p>
 							<p className="text-base sm:text-xl md:text-2xl font-bold">
-								{pool.amount} STX
+								{lobby.pool.currentAmount} STX
 							</p>
 						</div>
 					</div>
@@ -35,7 +35,7 @@ export default function LobbyStats({ pool }: { pool: Pool }) {
 								Players
 							</p>
 							<p className="text-base sm:text-xl md:text-2xl font-bold">
-								{pool.participants.length}/{pool.maxPlayers}
+								{lobby.participants.length}/{lobby.maxPlayers}
 							</p>
 						</div>
 					</div>
@@ -53,7 +53,7 @@ export default function LobbyStats({ pool }: { pool: Pool }) {
 								Game
 							</p>
 							<p className="text-base sm:text-xl md:text-2xl font-bold">
-								{pool.game.name}
+								{lobby.game.name}
 							</p>
 						</div>
 					</div>
