@@ -4,7 +4,7 @@ export interface Game {
   updatedAt: string;
   name: string;
   description: string;
-  tags: string;
+  tags: string[];
   image: string | null;
   activeLobbies: number;
   totalPrize: string;

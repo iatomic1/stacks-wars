@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import { Game } from "@/types/lobbySchema";
 
 export default function GameCard({ game }: { game: Game }) {
-  const tags = game.tags.split(",");
   return (
     <Card className="overflow-hidden">
       <div className="md:grid md:grid-cols-[1fr_300px] md:gap-6">
@@ -24,8 +23,8 @@ export default function GameCard({ game }: { game: Game }) {
               <div>
                 <CardTitle className="text-2xl">{game.name}</CardTitle>
                 <CardDescription className="mt-1">
-                  {tags &&
-                    tags.map((tag) => (
+                  {game.tags &&
+                    game.tags.map((tag) => (
                       <Badge variant="outline" key={tag} className="mr-2">
                         {tag}
                       </Badge>
