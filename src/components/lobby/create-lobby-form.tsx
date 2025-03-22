@@ -1,5 +1,5 @@
 "use client";
-import slugify from "react-slugify";
+//import slugify from "react-slugify";
 import { Button } from "@/components/ui/button";
 import { useServerAction } from "zsa-react";
 import {
@@ -29,12 +29,13 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { createLobbyAction } from "@/lib/actions/lobby";
-import { openContractDeploy } from "@stacks/connect";
 import { useUser } from "@/context/UserContext";
-import { userSession } from "@/context/WalletContext";
-import { getClarityCode } from "@/lib/pool-clarity-code";
+//import { openContractDeploy } from "@stacks/connect";
+//import { userSession } from "@/context/WalletContext";
+//import { getClarityCode } from "@/lib/pool-clarity-code";
 import { useCreateLobbyWithPool } from "@/hooks/useCreateLobbyWithPool";
-
+import { createLobbyWithPool } from "@/lib/lobbyWithPool";
+import { useRouter } from "next/navigation";
 //interface CreateLobbyFormProps {
 //	games: Game[];
 //	isLoading?: boolean;
@@ -64,18 +65,21 @@ const formSchema = z.object({
 		}),
 });
 
-export default function CreateLobbyForm() {
+export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 	const { user } = useUser();
+
+	const router = useRouter();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			name: "",
 			description: "",
-			withPool: true,
+			withPool: false,
 			amount: 100,
 			players: 10,
 		},
 	});
+
 	const { isPending, execute: executeCreateLobby } = useServerAction(
 		createLobbyAction,
 		{
@@ -83,6 +87,7 @@ export default function CreateLobbyForm() {
 				const data = args.data.data;
 				if (data && data.id !== "") {
 					toast.success("Lobby created successfully");
+					router.push(`/lexi-wars/${data.id}`);
 				}
 			},
 		}
@@ -96,66 +101,18 @@ export default function CreateLobbyForm() {
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		if (!user?.id) {
 			toast.info("User not authenticated", {
-				description: "You must be logged in to create a pool",
+				description: "You must be logged in to create a Lobby",
 			});
 
 			return;
 		}
 		if (values.withPool) {
-			const clarityCode = getClarityCode(
-				values.name,
-				values.players,
-				values.amount as number
-			);
-			await openContractDeploy({
-				network: "testnet",
-				userSession: userSession,
-				contractName: slugify(values.name) + "-stacks-wars",
-				codeBody: clarityCode,
-				onFinish: async (response) => {
-					console.log(response, response.txId);
-					try {
-						console.log("calling");
-						await executeCreateLobbyWithPool({
-							lobby: {
-								name: values.name,
-								description: values.description,
-								gameId: "543e3b33-8c49-43f0-9a04-60c97802b1b1",
-								maxPlayers: values.players,
-								creatorId: user.id,
-							},
-							pool: {
-								amount: values.amount?.toString() as string,
-								maxPlayers: values.players,
-								deployContractTxId: response.txId,
-								lobbyId: "543e3b33-8c49-43f0-9a04-60c97802b1b1",
-							},
-						});
-						console.log("called");
-					} catch (error) {
-						console.error(
-							"Error in executeCreateLobbyWithPool:",
-							error
-						);
-						toast.error("Failed to create lobby with pool", {
-							description:
-								(error as Error).message ||
-								"An unknown error occurred",
-						});
-					}
-				},
-
-				onCancel: () => {
-					toast("Failed to create pool", {
-						description: "User cancelled transaction",
-					});
-				},
-			});
+			createLobbyWithPool(values, executeCreateLobbyWithPool, user);
 		} else {
 			await executeCreateLobby({
 				name: values.name,
 				description: values.description,
-				gameId: "543e3b33-8c49-43f0-9a04-60c97802b1b1",
+				gameId: gameId,
 				maxPlayers: values.players,
 				creatorId: user.id,
 			});
@@ -266,7 +223,19 @@ export default function CreateLobbyForm() {
 									<FormControl>
 										<Switch
 											checked={field.value}
-											onCheckedChange={field.onChange}
+											onCheckedChange={(checked) => {
+												if (checked) {
+													toast.info(
+														"Pool feature coming soon!",
+														{
+															description:
+																"This feature is currently under development.",
+														}
+													);
+													return;
+												}
+												field.onChange(checked);
+											}}
 										/>
 									</FormControl>
 									<FormLabel>

@@ -48,9 +48,7 @@ export default async function CreateGame({
 								value="multiplayer"
 								className="space-y-6"
 							>
-								<CreatePoolForm
-								//games={games}
-								/>
+								<CreatePoolForm gameId={id} />
 
 								<div className="space-y-4">
 									<h2 className="text-2xl font-bold tracking-tighter sm:text-3xl">

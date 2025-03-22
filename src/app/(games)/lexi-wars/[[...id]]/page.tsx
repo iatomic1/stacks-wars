@@ -17,7 +17,7 @@ export default async function LobbyPlayGround({
 
 	let oppsData: PlayerScore[] = [];
 
-	if (id && id[0] === "1") {
+	if (id && id[0] === "c65e6288-aec4-4d8e-b07e-102003956f00") {
 		oppsData = [
 			{ username: "You", score: 10, isCurrentPlayer: true },
 			{ username: "WordWeaver", score: 42 },

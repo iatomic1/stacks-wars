@@ -16,7 +16,6 @@ export interface Pool {
 	updatedAt: string;
 	lobbyId: string;
 	currentAmount: number;
-	targetAmount: number;
 	maxPlayers: number;
 	entryAmount: number;
 	contractId: string | null;

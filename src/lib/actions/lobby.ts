@@ -1,54 +1,60 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { createServerAction } from "zsa";
-import { insertLobbySchema } from "../db/schema/lobby";
+import { lobbyInsertSchema } from "../db/schema/lobby";
 import { createLobby, createLobbyWithPool } from "../services/lobby";
-import { insertPoolSchema } from "../db/schema/pools";
+import { poolInsertSchema } from "../db/schema/pools";
 import { z } from "zod";
 
 export const createLobbyAction = createServerAction()
-  .input(insertLobbySchema)
-  .handler(async ({ input }) => {
-    console.log("input received", input);
-    try {
-      const pool = await createLobby(input);
-      revalidatePath("/lobby");
-      return { success: true, data: pool };
-    } catch (error) {
-      console.error("Error creating pool:", error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Failed to create pool",
-      };
-    }
-  });
+	.input(lobbyInsertSchema)
+	.handler(async ({ input }) => {
+		console.log("input received", input);
+		try {
+			const lobby = await createLobby(input);
+			revalidatePath("/lobby");
+			return { success: true, data: lobby };
+		} catch (error) {
+			console.error("Error creating lobby:", error);
+			return {
+				success: false,
+				error:
+					error instanceof Error
+						? error.message
+						: "Failed to create lobby",
+			};
+		}
+	});
 
 export const createLobbyWithPoolAction = createServerAction()
-  .input(
-    z.object({
-      lobby: insertLobbySchema,
-      pool: insertPoolSchema,
-    }),
-  )
-  .handler(async ({ input }) => {
-    console.log("input received", input);
-    try {
-      const data = await createLobbyWithPool(input.lobby, input.pool);
-      revalidatePath("/lobby");
-      return {
-        success: true,
-        data: {
-          ...data,
-        },
-      };
-    } catch (error) {
-      console.error("Error creating pool:", error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Failed to create pool",
-      };
-    }
-  });
+	.input(
+		z.object({
+			lobby: lobbyInsertSchema,
+			pool: poolInsertSchema,
+		})
+	)
+	.handler(async ({ input }) => {
+		console.log("input received", input);
+		try {
+			const data = await createLobbyWithPool(input.lobby, input.pool);
+			revalidatePath("/lobby");
+			return {
+				success: true,
+				data: {
+					...data,
+				},
+			};
+		} catch (error) {
+			console.error("Error creating pool:", error);
+			return {
+				success: false,
+				error:
+					error instanceof Error
+						? error.message
+						: "Failed to create pool",
+			};
+		}
+	});
 
 // export const updatePoolStatusAction = createServerAction()
 //  .input(
