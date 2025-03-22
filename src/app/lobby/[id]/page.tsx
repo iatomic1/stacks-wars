@@ -8,11 +8,12 @@ import JoinLobbyForm from "@/components/lobby/join-lobby-form";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 //import slugify from "react-slugify";
-import { lobbies } from "@/lib/data/lobbyData";
 import LobbyStats from "@/components/lobby/lobby-stats";
 import LobbyDetails from "@/components/lobby/lobby-details";
 import Participants from "@/components/lobby/participants";
 import GamePreview from "@/components/lobby/game-preview";
+import { getLobbyById } from "@/lib/services/lobby";
+import { Lobby } from "@/types/lobbySchema";
 //import { Badge } from "@/components/ui/badge";
 //import { getPoolById } from "@/lib/services/pools";
 //import getTransaction from "@/lib/services/transactions";
@@ -26,13 +27,13 @@ export default async function PoolDetailPage({
 	params: Promise<{ id: string }>;
 }) {
 	const id = (await params).id;
+	const lobby: Lobby | undefined = await getLobbyById(id);
+	if (!lobby) {
+		notFound();
+	}
 	//const pool = await getPoolById(poolId);
 	//const deployTx = await getTransaction(pool?.deployTxId);
 	//const initializeTx = await getTransaction(pool?.initializeTxId);
-
-	console.log(id);
-
-	// Pool dummy data
 
 	// Transaction data
 	//const deployTx = {
@@ -52,15 +53,6 @@ export default async function PoolDetailPage({
 	//	post_conditions: [],
 	//	anchor_mode: "any",
 	//};
-
-	if (!lobbies) {
-		notFound();
-	}
-	const lobby = lobbies.find((lobby) => lobby.id === id);
-
-	if (!lobby) {
-		notFound();
-	}
 
 	return (
 		<div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
@@ -125,6 +117,7 @@ export default async function PoolDetailPage({
 									}
 								>
 									<JoinLobbyForm
+										lobbyId={id}
 										amount={
 											lobby.pool.currentAmount /
 											lobby.pool.maxPlayers

@@ -3,11 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
 //import { getAvailableLobbies, getLobbies } from "@/lib/services/lobby";
-import { lobbies } from "@/lib/data/lobbyData";
-
+import { getLobbies } from "@/lib/services/lobby";
+import { Lobby } from "@/types/lobbySchema";
 export default async function PoolsPage() {
 	//const lobbies = await getAvailableLobbies();
 	//console.log(JSON.stringify(lobbies, null, 2));
+	const lobbies: Lobby[] = await getLobbies();
+
+	if (!lobbies) {
+		return <div>No lobbies found</div>;
+	}
 
 	return (
 		<div className="flex min-h-screen flex-col">

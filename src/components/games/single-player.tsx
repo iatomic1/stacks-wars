@@ -10,10 +10,10 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PlayCircle } from "lucide-react";
-import { Game } from "@/lib/data/games";
+import { Game } from "@/types/lobbySchema";
 
-export default function SinglePlayer({ game }: { game: Game }) {
-	console.log(game);
+export default function SinglePlayer({ game }: { game: Game | null }) {
+	if (!game) return null;
 	return (
 		<Card>
 			<CardHeader>

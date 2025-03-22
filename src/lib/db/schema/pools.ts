@@ -13,10 +13,6 @@ export const pools = pgTable("pools", {
 	currentAmount: decimal("currentAmount", { precision: 10, scale: 2 })
 		.notNull()
 		.default("0"),
-	targetAmount: decimal("targetAmount", {
-		precision: 10,
-		scale: 2,
-	}).notNull(),
 	maxPlayers: integer().notNull(),
 	entryAmount: decimal("entryAmount", { precision: 10, scale: 2 }).notNull(),
 	contractId: text(),
