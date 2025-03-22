@@ -39,7 +39,7 @@ export interface Lobby {
 	gameId: string;
 	maxPlayers: number;
 	status: "pending" | "open" | "completed" | "cancelled";
-	description: string;
+	description: string | null;
 	game: Game;
 	pool: Pool;
 	participants: Participant[];

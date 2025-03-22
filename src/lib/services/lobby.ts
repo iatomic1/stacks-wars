@@ -47,21 +47,56 @@ export const createLobbyWithPool = async (
 	});
 };
 
-export const getLobbyById = async (id: string) => {
-	return await db.query.lobby.findFirst({
-		where: eq(lobby.id, id),
-		with: {
-			creator: true,
-			game: true,
-			pool: true,
-			participants: {
-				with: {
-					user: true,
+export async function getLobbyById(id: string) {
+	try {
+		const result = await db.query.lobby.findFirst({
+			where: eq(lobby.id, id),
+			with: {
+				creator: true,
+				game: true,
+				pool: true,
+				participants: {
+					with: {
+						user: true,
+					},
 				},
 			},
-		},
-	});
-};
+		});
+
+		if (!result) return undefined;
+
+		return {
+			...result,
+			status: result.status as
+				| "pending"
+				| "open"
+				| "completed"
+				| "cancelled",
+			creator: {
+				...result.creator,
+				ready: false, // TODO: Remove this
+				amount: 0, // TODO: Remove this
+			},
+			participants: result.participants.map((p) => ({
+				...p,
+				amount: Number(p.amount),
+			})),
+			game: {
+				...result.game,
+				tags: JSON.parse(result.game.tags),
+				totalPrize: Number(result.game.totalPrize),
+			},
+			pool: {
+				...result.pool,
+				currentAmount: Number(result.pool?.currentAmount),
+				entryAmount: Number(result.pool?.entryAmount),
+			},
+		};
+	} catch (error) {
+		console.error("Error getting lobby by ID:", error);
+		return undefined;
+	}
+}
 
 export const updateLobbyStatus = async (lobbyId: string, status: string) => {
 	const [updatedLobby] = await db
