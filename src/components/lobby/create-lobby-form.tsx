@@ -87,7 +87,7 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 				const data = args.data.data;
 				if (data && data.id !== "") {
 					toast.success("Lobby created successfully");
-					router.push(`/lexi-wars/${data.id}`);
+					router.push(`/lobby/${data.id}`);
 				}
 			},
 		}
