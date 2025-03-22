@@ -12,7 +12,8 @@ export default async function LobbyPlayGround({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	if (id) console.log(id[0]);
+	if (id) console.log(id);
+	else console.log("No id");
 
 	let oppsData: PlayerScore[] = [];
 
