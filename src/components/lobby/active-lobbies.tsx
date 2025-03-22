@@ -14,7 +14,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Lobby } from "@/types/lobbySchema";
 
-export default function ActiveLobbies({ lobbies }: { lobbies: Lobby[] }) {
+export default async function ActiveLobbies({ lobbies }: { lobbies: Lobby[] }) {
 	return (
 		<>
 			{lobbies.map((lobby) => (
