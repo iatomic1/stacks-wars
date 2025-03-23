@@ -27,7 +27,7 @@ interface LexiWarsProps {
   oppsData?: OppsData[];
 }
 
-export default function LexiWars({ oppsData }: LexiWarsProps) {
+export default function MultiplayerLexiWars({ oppsData }: LexiWarsProps) {
   const [usedWords, setUsedWords] = useState<Set<string>>(new Set());
   const [word, setWord] = useState("");
   const [timeLeft, setTimeLeft] = useState(10);
@@ -50,7 +50,6 @@ export default function LexiWars({ oppsData }: LexiWarsProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isMultiplayer, setIsMultiplayer] = useState(false);
 
-  // Detect mobile device and set multiplayer state
   useEffect(() => {
     setIsMobile(
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -60,19 +59,16 @@ export default function LexiWars({ oppsData }: LexiWarsProps) {
     setIsMultiplayer(Boolean(oppsData && oppsData.length > 0));
   }, [oppsData]);
 
-  // Update rules when minWordLength or randomLetter changes
   useEffect(() => {
     setGameRules(rules(minWordLength, randomLetter));
   }, [minWordLength, randomLetter]);
 
-  // Generate new random values when rule changes
   useEffect(() => {
     setRandomLetter(
       "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)],
     );
   }, [currentRuleIndex, ruleRepeatCount, minWordLength]);
 
-  // Timer and high score update
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isPlaying && timeLeft > 0) {
