@@ -2,15 +2,22 @@ import React from "react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
-import { Game, games } from "@/lib/data/games";
 import { lobbies } from "@/lib/data/lobbyData";
 import CreatePoolForm from "@/components/lobby/create-lobby-form";
 import GameDetails from "@/components/games/game-details";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SinglePlayer from "@/components/games/single-player";
+import { getGameById } from "@/lib/services/games";
+import { Game } from "@/types/lobbySchema";
 
-export default function CreateGame() {
-	const game: Game = games[0];
+export default async function CreateGame({
+	params,
+}: {
+	params: Promise<{ id: string }>;
+}) {
+	const { id } = await params;
+
+	const game: Game | null = await getGameById(id);
 
 	return (
 		<div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
@@ -41,7 +48,7 @@ export default function CreateGame() {
 								value="multiplayer"
 								className="space-y-6"
 							>
-								<CreatePoolForm games={games} />
+								<CreatePoolForm gameId={id} />
 
 								<div className="space-y-4">
 									<h2 className="text-2xl font-bold tracking-tighter sm:text-3xl">

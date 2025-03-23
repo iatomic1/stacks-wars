@@ -10,12 +10,13 @@ Stacks Wars is a **gaming utility platform** built on the **Stacks blockchain**,
 -   **Progressive Difficulty:** Games increase in complexity based on player performance.
 -   **Word Validation API:** Utilizes Wordnik API for spelling-based game validation.
 -   **User Authentication & Wallet Integration:** Seamlessly connects with Stacks wallets for transactions.
+-   **On-Chain Gaming Pools:** Users can create and join betting pools using smart contracts.
 
 ## Tech Stack
 
 -   **Frontend:** Next.js, React, Tailwind CSS
 -   **Backend:** Node.js (Planned for backend logic)
--   **Smart Contracts:** Clarity (for on-chain interactions)
+-   **Smart Contracts:** Clarity (for on-chain interactions) - [Stacks Wars Pool Contract](https://github.com/your-repo-link)
 -   **Hosting:** Vercel
 
 ## Installation & Setup
@@ -35,6 +36,16 @@ bun dev
 2. **Enter Words:** Type words based on given letter constraints.
 3. **Progress Difficulty:** Longer words are required as the game progresses.
 4. **Win or Lose:** If no valid word is entered before time runs out, the opponent wins.
+
+## Smart Contract: Stacks Wars Pool Contract
+
+We have an on-chain betting system where users can create and join gaming pools using smart contracts written in Clarity. This contract handles:
+
+-   **Pool Creation:** Users can create betting pools with a fixed entry fee.
+-   **Joining Pools:** Players join pools by paying the entry fee.
+-   **Reward Claims:** Winners claim rewards using signed messages.
+
+You can check out the contract [here](https://github.com/iflames1/stacks-wars-contract).
 
 ## Roadmap
 

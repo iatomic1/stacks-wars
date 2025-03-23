@@ -4,7 +4,8 @@ import { Gamepad2, Users, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Game } from "@/types/lobbySchema";
 
-export default function GameDetails({ game }: { game: Game }) {
+export default function GameDetails({ game }: { game: Game | null }) {
+	if (!game) return null;
 	return (
 		<Card>
 			<CardHeader>

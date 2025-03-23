@@ -18,6 +18,7 @@ interface JoinPoolFormProps {
 	currentPlayers?: number;
 	isUserJoined?: boolean;
 	isUserConnected?: boolean;
+	lobbyId: string;
 }
 
 export default function JoinLobbyForm({
@@ -26,6 +27,7 @@ export default function JoinLobbyForm({
 	currentPlayers = 0,
 	isUserJoined = false,
 	isUserConnected = true,
+	lobbyId,
 }: JoinPoolFormProps) {
 	const router = useRouter();
 	const isLoading = false;
@@ -34,7 +36,7 @@ export default function JoinLobbyForm({
 	const handleSubmit = () => {
 		console.log("Joining pool...");
 		// Here you can add any additional logic needed when joining the pool
-		router.push(`/lexi-wars/1`);
+		router.push(`/lexi-wars/${lobbyId}`);
 	};
 
 	return (
