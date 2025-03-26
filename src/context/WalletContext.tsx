@@ -50,7 +50,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({
         if (isSignedIn) {
           try {
             const userData = userSession.loadUserData();
-            console.log(userData);
+            // console.log(userData);
             if (userData.profile && userData.profile.stxAddress) {
               setAddress(
                 userData.profile.stxAddress.mainnet ||

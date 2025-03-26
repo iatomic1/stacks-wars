@@ -1,3 +1,4 @@
+// useSocket.ts
 import { useState, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
@@ -6,19 +7,41 @@ export interface Player {
   username: string;
   score: number;
   isCurrentPlayer: boolean;
+  inactive?: boolean;
+  eliminated?: boolean;
 }
 
 export interface RoomData {
   roomId: string;
   roomCode: string;
   players: Player[];
+  currentRule?: string;
+  timeLimit?: number;
+  minWordLength?: number;
+}
+
+interface GameState {
+  isPlaying: boolean;
+  currentRule: string;
+  timeLeft: number;
+  minWordLength: number;
+  currentPlayer: string;
 }
 
 export const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [roomData, setRoomData] = useState<RoomData | null>(null);
-  const [gameInProgress, setGameInProgress] = useState(false);
+  const [gameState, setGameState] = useState<GameState>({
+    isPlaying: false,
+    currentRule: "",
+    timeLeft: 0,
+    minWordLength: 4,
+    currentPlayer: "",
+  });
+  const [gameHistory, setGameHistory] = useState<
+    Array<{ player: string; word: string; points: number; timestamp: number }>
+  >([]);
 
   useEffect(() => {
     const newSocket = io("http://localhost:3002", {
@@ -26,137 +49,144 @@ export const useSocket = () => {
     });
     setSocket(newSocket);
 
-    newSocket.on("connect", () => {
-      setIsConnected(true);
-    });
-
+    newSocket.on("connect", () => setIsConnected(true));
     newSocket.on("disconnect", () => {
       setIsConnected(false);
       setRoomData(null);
-      setGameInProgress(false);
-    });
-
-    newSocket.on("error", (data: { message: string }) => {
-      toast.error(data.message);
-    });
-
-    // Room creation events
-    newSocket.on("roomCreated", (data) => {
-      setRoomData({
-        roomId: data.roomId,
-        roomCode: data.roomCode,
-        players: data.players,
+      setGameState({
+        isPlaying: false,
+        currentRule: "",
+        timeLeft: 0,
+        minWordLength: 4,
+        currentPlayer: "",
       });
-      toast.success(`Room created with code: ${data.roomCode}`);
     });
 
-    // Player events
-    newSocket.on("playerJoined", (data) => {
-      setRoomData({
-        roomId: data.roomId,
-        roomCode: data.roomCode,
-        players: data.players,
+    // Room Events
+    newSocket.on("roomCreated", (data: RoomData) => {
+      setRoomData(data);
+      toast.success(`Room created: ${data.roomCode}`);
+    });
+
+    newSocket.on("roomJoined", (data: RoomData) => {
+      setRoomData(data);
+    });
+
+    newSocket.on("playerJoined", (data: RoomData) => {
+      setRoomData(data);
+      toast.info("New player joined");
+    });
+
+    // Game Events
+    newSocket.on("gameStarted", (data: RoomData & GameState) => {
+      setGameState({
+        isPlaying: true,
+        currentRule: data.currentRule || "",
+        timeLeft: data.timeLimit || 0,
+        minWordLength: data.minWordLength || 4,
+        currentPlayer:
+          data.players.find((p) => p.isCurrentPlayer)?.username || "",
       });
-      toast.info(`New player joined the room`);
+      setRoomData(data);
     });
 
-    newSocket.on("playerInactive", (data) => {
-      setRoomData((prev) =>
-        prev
-          ? {
-              ...prev,
-              players: data.players,
-            }
-          : null,
-      );
-      toast.info(`${data.username} disconnected`);
-    });
-
-    // Game state events
-    newSocket.on("gameStarted", () => {
-      setGameInProgress(true);
-    });
-
-    newSocket.on("gamePaused", () => {
-      setGameInProgress(false);
-    });
-
-    // When word is submitted, update player scores and current player
-    newSocket.on("wordSubmitted", (data) => {
-      setRoomData((prev) => {
-        if (!prev) return null;
-        // Update player scores and current player status
-        return {
+    newSocket.on(
+      "timeUpdate",
+      (data: { timeLeft: number; currentPlayer: string }) => {
+        setGameState((prev) => ({
           ...prev,
-          players: data.players.map((player: any) => ({
-            ...player,
-            isCurrentPlayer: player.username === data.currentPlayer,
-          })),
-        };
-      });
-    });
+          timeLeft: data.timeLeft,
+          currentPlayer: data.currentPlayer,
+        }));
+      },
+    );
 
-    // Also update on timeUpdate events
-    newSocket.on("timeUpdate", (data) => {
-      if (data.currentPlayer && roomData) {
-        setRoomData((prev) => {
-          if (!prev) return null;
-          return {
-            ...prev,
-            players: prev.players.map((player) => ({
-              ...player,
-              isCurrentPlayer: player.username === data.currentPlayer,
-            })),
-          };
-        });
-      }
-    });
+    newSocket.on(
+      "wordSubmitted",
+      (data: {
+        players: Player[];
+        word: string;
+        points: number;
+        currentRule: string;
+        currentPlayer: string;
+      }) => {
+        setGameHistory((prev) => [
+          {
+            player: data.currentPlayer,
+            word: data.word,
+            points: data.points,
+            timestamp: Date.now(),
+          },
+          ...prev,
+        ]);
+
+        setRoomData((prev) =>
+          prev
+            ? {
+                ...prev,
+                players: data.players,
+                currentRule: data.currentRule,
+              }
+            : null,
+        );
+
+        setGameState((prev) => ({
+          ...prev,
+          currentPlayer: data.currentPlayer,
+        }));
+      },
+    );
+
+    newSocket.on(
+      "playerEliminated",
+      (data: { username: string; players: Player[] }) => {
+        setRoomData((prev) =>
+          prev
+            ? {
+                ...prev,
+                players: prev.players.map((p) =>
+                  p.username === data.username ? { ...p, eliminated: true } : p,
+                ),
+              }
+            : null,
+        );
+        toast.error(`${data.username} eliminated!`);
+      },
+    );
+
+    newSocket.on(
+      "gameOver",
+      (data: { winners: Player[]; players: Player[]; reason: string }) => {
+        setGameState((prev) => ({ ...prev, isPlaying: false }));
+        setRoomData((prev) =>
+          prev
+            ? {
+                ...prev,
+                players: data.players,
+              }
+            : null,
+        );
+        toast.success(`Game Over: ${data.reason}`);
+      },
+    );
 
     return () => {
       newSocket.disconnect();
     };
   }, []);
 
-  const createRoom = (username: string) => {
-    if (!socket) {
-      toast.error("Socket connection not established.");
-      return;
-    }
-    socket.emit("createRoom", { username });
-  };
-
-  const joinRoom = (roomCode: string, username: string) => {
-    if (!socket) {
-      toast.error("Socket connection not established.");
-      return;
-    }
-    socket.emit("joinRoom", { roomId: roomCode, username });
-  };
-
-  const startGame = (roomId: string) => {
-    if (!socket) {
-      toast.error("Socket connection not established.");
-      return;
-    }
-    socket.emit("startGame", roomId);
-  };
-
-  const submitWord = (roomId: string, word: string) => {
-    if (!socket) {
-      toast.error("Socket connection not established.");
-      return;
-    }
-    socket.emit("submitWord", { roomId, word });
-  };
-
   return {
     socket,
     isConnected,
     roomData,
-    gameInProgress,
-    createRoom,
-    joinRoom,
-    startGame,
-    submitWord,
+    gameState,
+    gameHistory,
+    createRoom: (username: string) => socket?.emit("createRoom", { username }),
+    joinRoom: (lobbyId: string, username: string, userId: string) =>
+      socket?.emit("joinRoom", { lobbyId, username, userId }),
+    startGame: (roomId: string, userId: string) =>
+      socket?.emit("startGame", { lobbyId: roomId, userId }),
+    submitWord: (roomId: string, word: string, userId: string) =>
+      socket?.emit("submitWord", { roomId, word, userId }),
   };
 };
