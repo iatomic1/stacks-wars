@@ -14,27 +14,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+//import { createGamePool } from "@/lib/wallet/createGamePool";
+import { generateWinnerSignature } from "@/lib/wallet/wallet";
 
 const formSchema = z.object({
 	poolName: z.string().min(1, {
 		message: "Pool Name is required.",
 	}),
-	entryFee: z.number().min(1, {
-		message: "Entry Fee must be at least 1.",
-	}),
+	entryFee: z
+		.string()
+		.min(1, {
+			message: "Entry Fee is required.",
+		})
+		.transform((val) => parseFloat(val))
+		.refine((val) => !isNaN(val) && val >= 1, {
+			message: "Entry Fee must be at least 1.",
+		}),
 });
 
 export default function TestPage() {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
-		defaultValues: {
-			poolName: "",
-			entryFee: 100,
-		},
 	});
 
 	const onSubmit = (values: z.infer<typeof formSchema>) => {
 		console.log(values);
+		const signature = generateWinnerSignature(
+			1,
+			"STF0V8KWBS70F0WDKTMY65B3G591NN52PR4Z71Y3",
+			200
+		);
+		console.log("Signature", signature);
 	};
 
 	return (
@@ -60,7 +70,7 @@ export default function TestPage() {
 									/>
 								</FormControl>
 								<FormDescription>
-									Enter the name of the pool.
+									Enter of the pool id.
 								</FormDescription>
 								<FormMessage />
 							</FormItem>
@@ -73,7 +83,7 @@ export default function TestPage() {
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel htmlFor="entryFee">
-									Entry Fee:
+									Enter Claim amount
 								</FormLabel>
 								<FormControl>
 									<Input
@@ -84,13 +94,13 @@ export default function TestPage() {
 									/>
 								</FormControl>
 								<FormDescription>
-									Enter the entry fee for the pool.
+									Enter the amount to claim.
 								</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
-					<Button type="submit">Create</Button>
+					<Button type="submit">Generate Signature</Button>
 				</form>
 			</Form>
 		</div>
