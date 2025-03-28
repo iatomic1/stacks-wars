@@ -9,7 +9,6 @@ import React, {
 import { showConnect } from "@stacks/connect";
 import { AppConfig, UserSession } from "@stacks/connect";
 
-// Create the AppConfig and UserSession
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 export const userSession = new UserSession({ appConfig });
 
