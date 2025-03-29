@@ -36,7 +36,6 @@ import { useUser } from "@/context/UserContext";
 import { useCreateLobbyWithPool } from "@/hooks/useCreateLobbyWithPool";
 import { createLobbyWithPool } from "@/lib/lobbyWithPool";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 //interface CreateLobbyFormProps {
 //	games: Game[];
 //	isLoading?: boolean;
@@ -81,8 +80,7 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 		},
 	});
 
-	const [withPool, setWithPool] = useState<boolean>(form.watch("withPool"));
-	//const withPool = form.watch("withPool");
+	const withPool = form.watch("withPool");
 
 	const { isPending, execute: executeCreateLobby } = useServerAction(
 		createLobbyAction,
@@ -224,10 +222,9 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 								<FormItem className="flex flex-row items-center space-x-2 space-y-0">
 									<FormControl>
 										<Switch
-											//checked={field.value}
-											checked={withPool || field.value}
+											checked={field.value}
 											onCheckedChange={() => {
-												setWithPool(!withPool);
+												field.onChange(!field.value);
 											}}
 										/>
 									</FormControl>
