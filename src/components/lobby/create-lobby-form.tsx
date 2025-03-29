@@ -36,6 +36,7 @@ import { useUser } from "@/context/UserContext";
 import { useCreateLobbyWithPool } from "@/hooks/useCreateLobbyWithPool";
 import { createLobbyWithPool } from "@/lib/lobbyWithPool";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 //interface CreateLobbyFormProps {
 //	games: Game[];
 //	isLoading?: boolean;
@@ -48,7 +49,7 @@ const formSchema = z.object({
 	description: z.string().min(3, {
 		message: "Lobby description must be at least 3 characters.",
 	}),
-	withPool: z.boolean().default(true),
+	withPool: z.boolean().default(false),
 	amount: z.coerce
 		.number()
 		.min(1, {
@@ -80,6 +81,9 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 		},
 	});
 
+	const [withPool, setWithPool] = useState<boolean>(form.watch("withPool"));
+	//const withPool = form.watch("withPool");
+
 	const { isPending, execute: executeCreateLobby } = useServerAction(
 		createLobbyAction,
 		{
@@ -95,8 +99,6 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 
 	const { isPending: isLoading, execute: executeCreateLobbyWithPool } =
 		useCreateLobbyWithPool();
-
-	const withPool = form.watch("withPool");
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		if (!user?.id) {
@@ -222,19 +224,10 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 								<FormItem className="flex flex-row items-center space-x-2 space-y-0">
 									<FormControl>
 										<Switch
-											checked={field.value}
-											onCheckedChange={(checked) => {
-												if (checked) {
-													toast.info(
-														"Pool feature coming soon!",
-														{
-															description:
-																"This feature is currently under development.",
-														}
-													);
-													return;
-												}
-												field.onChange(checked);
+											//checked={field.value}
+											checked={withPool || field.value}
+											onCheckedChange={() => {
+												setWithPool(!withPool);
 											}}
 										/>
 									</FormControl>
