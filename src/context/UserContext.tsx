@@ -25,6 +25,7 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const { connected, address } = useWallet();
+
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -33,12 +34,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-
       let userRecord = await fetchUserByAddress(stxAddress);
 
       if (!userRecord) {
         const defaultUsername = `user_${stxAddress.slice(0, 6)}`;
-
         userRecord = await createNewUser({
           stxAddress,
           username: defaultUsername,
@@ -52,7 +51,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
           ? err
           : new Error("Failed to fetch or create user"),
       );
-      console.error("Error fetching or creating user:", err);
     } finally {
       setLoading(false);
     }
