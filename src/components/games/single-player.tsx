@@ -36,7 +36,7 @@ export default function SinglePlayer({ game }: { game: Game | null }) {
 			</CardContent>
 			<CardFooter className="flex justify-end">
 				<Button asChild>
-					<Link href={`/lexi-wars`}>
+					<Link href={`/lexi-wars/single`}>
 						<PlayCircle className="mr-2 h-5 w-5" />
 						Play Now
 					</Link>
