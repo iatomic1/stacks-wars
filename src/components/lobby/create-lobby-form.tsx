@@ -34,8 +34,11 @@ import { useUser } from "@/context/UserContext";
 //import { userSession } from "@/context/WalletContext";
 //import { getClarityCode } from "@/lib/pool-clarity-code";
 import { useCreateLobbyWithPool } from "@/hooks/useCreateLobbyWithPool";
-import { createLobbyWithPool } from "@/lib/lobbyWithPool";
+//import { createLobbyWithPool } from "@/lib/lobbyWithPool";
 import { useRouter } from "next/navigation";
+import { getClarityCode } from "@/lib/pool-clarity-code";
+import { openContractDeploy } from "@stacks/connect";
+import { userSession } from "@/context/WalletContext";
 //interface CreateLobbyFormProps {
 //	games: Game[];
 //	isLoading?: boolean;
@@ -106,8 +109,52 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 
 			return;
 		}
-		if (values.withPool) {
-			createLobbyWithPool(values, executeCreateLobbyWithPool, user);
+		if (values.withPool && values.amount) {
+			//createLobbyWithPool(values, executeCreateLobbyWithPool, user);
+			const clarityCode = getClarityCode(values.amount);
+			openContractDeploy({
+				network: "testnet",
+				userSession: userSession,
+				contractName: `${values.name}-stacks-wars`,
+				codeBody: clarityCode,
+				onFinish: async (response) => {
+					console.log(response, response.txId);
+					try {
+						await executeCreateLobbyWithPool({
+							lobby: {
+								name: values.name,
+								description: values.description,
+								gameId: gameId,
+								maxPlayers: values.players,
+								creatorId: user.id,
+							},
+							pool: {
+								entryAmount:
+									values.amount?.toString() as string,
+								maxPlayers: values.players,
+								deployContractTxId: response.txId,
+								lobbyId: gameId,
+							},
+						});
+					} catch (error) {
+						console.error(
+							"Error in executeCreateLobbyWithPool:",
+							error
+						);
+						toast.error("Failed to create lobby with pool", {
+							description:
+								(error as Error).message ||
+								"An unknown error occurred",
+						});
+					}
+				},
+
+				onCancel: () => {
+					toast("Failed to create pool", {
+						description: "User cancelled transaction",
+					});
+				},
+			});
 		} else {
 			await executeCreateLobby({
 				name: values.name,

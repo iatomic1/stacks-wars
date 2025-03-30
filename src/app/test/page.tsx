@@ -40,9 +40,8 @@ export default function TestPage() {
 	const onSubmit = (values: z.infer<typeof formSchema>) => {
 		console.log(values);
 		const signature = generateWinnerSignature(
-			1,
-			"STF0V8KWBS70F0WDKTMY65B3G591NN52PR4Z71Y3",
-			200
+			1000,
+			"ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
 		);
 		console.log("Signature", signature);
 	};

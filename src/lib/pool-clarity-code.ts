@@ -1,96 +1,166 @@
-export const getClarityCode = (
-	name: string,
-	players: number,
-	totalPrize: number
-) => {
-	const amountPerPlayer = Math.floor(totalPrize / players);
+export const getClarityCode = (entryFee: number) => {
+	return `
+;; ==============================
+;; Stacks Wars - Pool Contract
+;; ==============================
+;; A pool where players join by paying a fixed entry fee.
+;; Winners are determined off-chain and claim rewards using signed messages.
 
-	return `;; Stacks Game Pool Contract
-;; Each contract represents a single pool where players stake STX to play
+;; ----------------------
+;; CONSTANTS
+;; ----------------------
 
-;; Define constants for error codes
-(define-constant err-game-already-started (err u1))
-(define-constant err-pool-full (err u2))
-(define-constant err-already-joined (err u3))
-(define-constant err-invalid-stake-amount (err u4))
-(define-constant err-transfer-failed (err u5))
-(define-constant err-not-owner (err u6))
-(define-constant err-game-not-started (err u7))
-(define-constant err-winner-already-set (err u8))
-(define-constant err-not-a-player (err u9))
-(define-constant err-pool-not-full (err u10))
-(define-constant err-invalid-player-count (err u11))
-(define-constant err-invalid-prize-amount (err u12))
-(define-constant err-invalid-name (err u13))
-(define-constant err-division-by-zero (err u14))
+;; Trusted signer for winner verification
+(define-constant TRUSTED_SIGNER 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; TODO: Replace with the actual signer before deployment
+(define-constant TRUSTED_PUBLIC_KEY 0x0390a5cac7c33fda49f70bc1b0866fa0ba7a9440d9de647fecb8132ceb76a94dfa)
 
-;; Define data variables
-(define-data-var contract-owner principal tx-sender)
-(define-data-var pool-name (string-ascii 50) "${name}")
-(define-data-var max-players uint u${players})
-(define-data-var prize-pool uint u${totalPrize})
-(define-data-var amount-per-player uint u${amountPerPlayer})
-(define-data-var current-player-count uint u0)
-(define-data-var total-staked uint u0)
-(define-data-var game-started bool false)
-(define-data-var winner (optional principal) none)
+;; Fixed entry fee for all players
+(define-constant ENTRY_FEE u${entryFee})
 
-;; Map to track players in the pool
-(define-map pool-players
-	{ player: principal }
-	{ amount-staked: uint })
+;; Error codes
+(define-constant ERR_ALREADY_JOINED u1)
+(define-constant ERR_INSUFFICIENT_FUNDS u2)
+(define-constant ERR_TRANSFER_FAILED u3)
+(define-constant ERR_REWARD_ALREADY_CLAIMED u4)
+(define-constant ERR_INVALID_SIGNATURE u5)
+(define-constant ERR_INVALID_AMOUNT u6)
+(define-constant ERR_MAXIMUM_REWARD_EXCEEDED u7)
+(define-constant ERR_REENTRANCY u8)
 
-;; Map to track players by index
-(define-map player-indices
-	{ index: uint }
-	{ player: principal })
+;; ----------------------
+;; DATA VARIABLES
+;; ----------------------
 
-;; Function for players to join the pool
+;; Track total balance of the pool
+(define-data-var pool-balance uint u0)
+
+;; Track total number of players
+(define-data-var total-players uint u0)
+
+;; Track players who joined the pool
+(define-map players {player: principal} {joined-at: uint})
+
+;; Track claimed rewards
+(define-map claimed-rewards {player: principal} {claimed: bool, amount: uint})
+
+;; Reentrancy guard
+(define-data-var executing bool false)
+
+;; ----------------------
+;; HELPER FUNCTIONS
+;; ----------------------
+
+(define-private (begin-execution)
+    (begin
+        (asserts! (not (var-get executing)) (err ERR_REENTRANCY))
+        (var-set executing true)
+        (ok true)
+    )
+)
+
+(define-private (construct-message-hash (amount uint))
+    (let ((message {amount: amount, winner: tx-sender}))
+        (match (to-consensus-buff? message)
+            buff (ok (sha256 buff))
+            (err ERR_INVALID_AMOUNT)
+        )
+    )
+)
+
+;; ----------------------
+;; PUBLIC FUNCTIONS
+;; ----------------------
+
+;; Players join the shared pool by paying the fixed entry fee
 (define-public (join-pool)
-	(begin
-		;; Check if the game has already started
-		(asserts! (not (var-get game-started)) err-game-already-started)
+    (begin
+        ;; Check if player has already joined
+        (asserts! (not (is-some (map-get? players {player: tx-sender}))) (err ERR_ALREADY_JOINED))
 
-		;; Check if the pool is full
-		(asserts! (< (var-get current-player-count) (var-get max-players)) err-pool-full)
+        ;; Transfer STX from player to contract
+        (match (stx-transfer? ENTRY_FEE tx-sender (as-contract tx-sender))
+            success
+            (begin
+                ;; Record player's entry
+                (map-set players {player: tx-sender} {joined-at: stacks-block-height})
 
-		;; Check if the sender has already joined
-		(asserts! (is-none (map-get? pool-players { player: tx-sender })) err-already-joined)
+                ;; Update pool balance and player count
+                (var-set pool-balance (+ (var-get pool-balance) ENTRY_FEE))
+                (var-set total-players (+ (var-get total-players) u1))
+                (ok true)
+            )
+            error (err ERR_TRANSFER_FAILED)
+        )
+    )
+)
 
-		;; Transfer STX from the sender to the contract
-		(let ((transfer-result (stx-transfer? (var-get amount-per-player) tx-sender (as-contract tx-sender))))
-			(asserts! (is-ok transfer-result) err-transfer-failed)
+;; Winners claim rewards using signed messages
+(define-public (claim-reward (amount uint) (signature (buff 65)))
+    (begin
+        ;; Apply reentrancy guard
+        (try! (begin-execution))
 
-			;; Update the pool state
-			(map-set pool-players { player: tx-sender } { amount-staked: (var-get amount-per-player) })
-			(map-set player-indices { index: (var-get current-player-count) } { player: tx-sender })
-			(var-set current-player-count (+ (var-get current-player-count) u1))
-			(var-set total-staked (+ (var-get total-staked) (var-get amount-per-player)))
+        ;; Check if reward has already been claimed
+        (asserts! (not (is-some (map-get? claimed-rewards {player: tx-sender}))) (err ERR_REWARD_ALREADY_CLAIMED))
 
-			(ok (var-get current-player-count)))))
+        ;; Ensure the amount doesn't exceed pool balance
+        (asserts! (<= amount (var-get pool-balance)) (err ERR_MAXIMUM_REWARD_EXCEEDED))
 
-;; Read-only functions to get pool information
-(define-read-only (get-pool-info)
-	{
-		name: (var-get pool-name),
-		max-players: (var-get max-players),
-		prize-pool: (var-get prize-pool),
-		amount-per-player: (var-get amount-per-player),
-		current-player-count: (var-get current-player-count),
-		total-staked: (var-get total-staked),
-		game-started: (var-get game-started),
-		winner: (var-get winner)
-	})
+        ;; Construct message hash for verification
+        (let (
+			(msg-hash (try! (construct-message-hash amount)))
+			(recipient tx-sender)  ;; Store original sender in recipient
+			)
+            ;; Verify signature
+            (asserts! (secp256k1-verify msg-hash signature TRUSTED_PUBLIC_KEY) (err ERR_INVALID_SIGNATURE))
 
-(define-read-only (is-player-in-pool (address principal))
-	(is-some (map-get? pool-players { player: address })))
+            ;; Transfer reward to player
+            (match (as-contract (stx-transfer? amount tx-sender recipient))
+                success
+                (begin
+                    ;; Mark reward as claimed
+                    (map-set claimed-rewards {player: tx-sender} {claimed: true, amount: amount})
 
-(define-read-only (get-player-at-index (index uint))
-	(map-get? player-indices { index: index }))
+                    ;; Update pool balance
+                    (var-set pool-balance (- (var-get pool-balance) amount))
 
-(define-read-only (get-players)
-	(ok {
-		max: (var-get max-players),
-		current: (var-get current-player-count)
-	}))`;
+                    ;; End execution (release the reentrancy guard)
+					(var-set executing false)
+                    (ok true)
+                )
+                error
+                (begin
+                    ;; End execution (release the reentrancy guard)
+					(var-set executing false)
+                    (err ERR_TRANSFER_FAILED)
+                )
+            )
+        )
+    )
+)
+
+;; ----------------------
+;; READ-ONLY FUNCTIONS
+;; ----------------------
+
+;; Get total pool balance
+(define-read-only (get-pool-balance)
+    (var-get pool-balance)
+)
+
+;; Get total number of players
+(define-read-only (get-total-players)
+    (var-get total-players)
+)
+
+;; Check if a player has joined
+(define-read-only (has-player-joined (player principal))
+    (is-some (map-get? players {player: player}))
+)
+
+;; Check if a player has claimed their reward
+(define-read-only (has-claimed-reward (player principal))
+    (default-to false (get claimed (map-get? claimed-rewards {player: player})))
+)
+`;
 };

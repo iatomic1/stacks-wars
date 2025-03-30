@@ -9,11 +9,7 @@ export const createLobbyWithPool = async (
 	executeCreateLobbyWithPool,
 	user
 ) => {
-	const clarityCode = getClarityCode(
-		values.name,
-		values.players,
-		values.amount as number
-	);
+	const clarityCode = getClarityCode(values.amount);
 	await openContractDeploy({
 		network: "testnet",
 		userSession: userSession,

@@ -52,13 +52,28 @@ const sha256 = (buffer: Buffer): Buffer => {
 	return createHash("sha256").update(buffer).digest();
 };
 
+//export const createClarityMessageHash = (
+//	poolId: number,
+//	amount: number,
+//	winnerAddress: string
+//) => {
+//	const message = tupleCV({
+//		"pool-id": uintCV(poolId),
+//		amount: uintCV(amount),
+//		winner: principalCV(winnerAddress),
+//	});
+
+//	const serialized = serializeCV(message); // Serializes the tuple
+//	console.log(serialized);
+//	const hash = sha256(Buffer.from(serialized, "hex"));
+//	return hash;
+//};
+
 export const createClarityMessageHash = (
-	poolId: number,
 	amount: number,
 	winnerAddress: string
 ) => {
 	const message = tupleCV({
-		"pool-id": uintCV(poolId),
 		amount: uintCV(amount),
 		winner: principalCV(winnerAddress),
 	});
@@ -82,12 +97,23 @@ export const broadcastTx = async (transaction: StacksTransactionWire) => {
 	}
 };
 
+//export const generateWinnerSignature = async (
+//	poolId: number,
+//	winner: string,
+//	amount: number
+//) => {
+//	const hash = createClarityMessageHash(poolId, amount, winner);
+//	return signMessageHashRsv({
+//		messageHash: hash.toString("hex"),
+//		privateKey,
+//	});
+//};
+
 export const generateWinnerSignature = async (
-	poolId: number,
-	winner: string,
-	amount: number
+	amount: number,
+	winner: string
 ) => {
-	const hash = createClarityMessageHash(poolId, amount, winner);
+	const hash = createClarityMessageHash(amount, winner);
 	return signMessageHashRsv({
 		messageHash: hash.toString("hex"),
 		privateKey,
