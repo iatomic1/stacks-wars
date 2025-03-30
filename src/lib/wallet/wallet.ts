@@ -15,9 +15,12 @@ import { generateWallet } from "@stacks/wallet-sdk";
 import { Wallet } from "@/types/wallet";
 import { PrivateKey } from "@stacks/common";
 import { STACKS_TESTNET } from "@stacks/network";
+import { request } from "@stacks/connect";
+import { GetAccountsResult } from "@stacks/connect/dist/types/methods";
 
-const secretKey = process.env.TRUSTED_SIGNER_SECRET_KEY || "";
-//("twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw");
+const secretKey =
+	process.env.TRUSTED_SIGNER_SECRET_KEY ||
+	"twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw"; // doesn't seems to load from .env
 
 export const NETWORK = STACKS_TESTNET;
 
@@ -39,17 +42,38 @@ export const contractName = "pool-2";
 // Get Public Key
 //console.log("Public key", privateKeyToPublic(generatePrivateKey(wallet)));
 
+// not accurate
+export const publicKey = async (): Promise<string> => {
+	const accounts: GetAccountsResult = await request("stx_getAccounts");
+	return accounts.accounts[2].publicKey;
+};
+
 const sha256 = (buffer: Buffer): Buffer => {
 	return createHash("sha256").update(buffer).digest();
 };
 
+//export const createClarityMessageHash = (
+//	poolId: number,
+//	amount: number,
+//	winnerAddress: string
+//) => {
+//	const message = tupleCV({
+//		"pool-id": uintCV(poolId),
+//		amount: uintCV(amount),
+//		winner: principalCV(winnerAddress),
+//	});
+
+//	const serialized = serializeCV(message); // Serializes the tuple
+//	console.log(serialized);
+//	const hash = sha256(Buffer.from(serialized, "hex"));
+//	return hash;
+//};
+
 export const createClarityMessageHash = (
-	poolId: number,
 	amount: number,
 	winnerAddress: string
 ) => {
 	const message = tupleCV({
-		"pool-id": uintCV(poolId),
 		amount: uintCV(amount),
 		winner: principalCV(winnerAddress),
 	});
@@ -73,12 +97,23 @@ export const broadcastTx = async (transaction: StacksTransactionWire) => {
 	}
 };
 
+//export const generateWinnerSignature = async (
+//	poolId: number,
+//	winner: string,
+//	amount: number
+//) => {
+//	const hash = createClarityMessageHash(poolId, amount, winner);
+//	return signMessageHashRsv({
+//		messageHash: hash.toString("hex"),
+//		privateKey,
+//	});
+//};
+
 export const generateWinnerSignature = async (
-	poolId: number,
-	winner: string,
-	amount: number
+	amount: number,
+	winner: string
 ) => {
-	const hash = createClarityMessageHash(poolId, amount, winner);
+	const hash = createClarityMessageHash(amount, winner);
 	return signMessageHashRsv({
 		messageHash: hash.toString("hex"),
 		privateKey,
