@@ -26,6 +26,7 @@ export const getClarityCode = (entryFee: number) => {
 (define-constant ERR_INVALID_AMOUNT u6)
 (define-constant ERR_MAXIMUM_REWARD_EXCEEDED u7)
 (define-constant ERR_REENTRANCY u8)
+(define-constant ERR_NOT_JOINED u9)
 
 ;; ----------------------
 ;; DATA VARIABLES
@@ -111,6 +112,7 @@ export const getClarityCode = (entryFee: number) => {
 			(msg-hash (try! (construct-message-hash amount)))
 			(recipient tx-sender)  ;; Store original sender in recipient
 			)
+
             ;; Verify signature
             (asserts! (secp256k1-verify msg-hash signature TRUSTED_PUBLIC_KEY) (err ERR_INVALID_SIGNATURE))
 
@@ -132,6 +134,50 @@ export const getClarityCode = (entryFee: number) => {
                 (begin
                     ;; End execution (release the reentrancy guard)
 					(var-set executing false)
+                    (err ERR_TRANSFER_FAILED)
+                )
+            )
+        )
+    )
+)
+
+;; Players leave the pool and get refunded with a verified signature
+(define-public (leave-pool (signature (buff 65)))
+    (begin
+        ;; Apply reentrancy guard
+        (try! (begin-execution))
+
+        ;; Ensure player has joined the pool
+        (asserts! (is-some (map-get? players {player: tx-sender})) (err ERR_NOT_JOINED))
+
+        ;; Construct message hash for verification
+        (let (
+            (msg-hash (try! (construct-message-hash ENTRY_FEE)))
+            (recipient tx-sender)  ;; Store original sender in recipient
+            )
+
+            ;; Verify signature
+            (asserts! (secp256k1-verify msg-hash signature TRUSTED_PUBLIC_KEY) (err ERR_INVALID_SIGNATURE))
+
+            ;; Transfer refund to player
+            (match (as-contract (stx-transfer? ENTRY_FEE tx-sender recipient))
+                success
+                (begin
+                    ;; Remove player from the pool
+                    (map-delete players {player: tx-sender})
+
+                    ;; Update pool balance and player count
+                    (var-set pool-balance (- (var-get pool-balance) ENTRY_FEE))
+                    (var-set total-players (- (var-get total-players) u1))
+
+                    ;; End execution (release the reentrancy guard)
+                    (var-set executing false)
+                    (ok true)
+                )
+                error
+                (begin
+                    ;; End execution (release the reentrancy guard)
+                    (var-set executing false)
                     (err ERR_TRANSFER_FAILED)
                 )
             )
