@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { getClarityCode } from "@/lib/pool-clarity-code";
+import { request } from "@stacks/connect";
 //import { createGamePool } from "@/lib/wallet/createGamePool";
 import { generateWinnerSignature } from "@/lib/wallet/wallet";
 
@@ -37,13 +39,20 @@ export default function TestPage() {
 		resolver: zodResolver(formSchema),
 	});
 
-	const onSubmit = (values: z.infer<typeof formSchema>) => {
+	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		console.log(values);
 		const signature = generateWinnerSignature(
-			1000,
-			"ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"
+			100,
+			"ST16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY2M1PXJ7"
 		);
 		console.log("Signature", signature);
+		const clarityCode = getClarityCode(100);
+		const response = await request("stx_deployContract", {
+			name: "stacks-wars-ts",
+			clarityCode,
+			network: "testnet",
+		});
+		console.log(response);
 	};
 
 	return (

@@ -1,5 +1,4 @@
 "use client";
-//import slugify from "react-slugify";
 import { Button } from "@/components/ui/button";
 import { useServerAction } from "zsa-react";
 import {
@@ -30,19 +29,10 @@ import {
 } from "@/components/ui/form";
 import { createLobbyAction } from "@/lib/actions/lobby";
 import { useUser } from "@/context/UserContext";
-//import { openContractDeploy } from "@stacks/connect";
-//import { userSession } from "@/context/WalletContext";
-//import { getClarityCode } from "@/lib/pool-clarity-code";
 import { useCreateLobbyWithPool } from "@/hooks/useCreateLobbyWithPool";
-//import { createLobbyWithPool } from "@/lib/lobbyWithPool";
 import { useRouter } from "next/navigation";
 import { getClarityCode } from "@/lib/pool-clarity-code";
-import { openContractDeploy } from "@stacks/connect";
-import { userSession } from "@/context/WalletContext";
-//interface CreateLobbyFormProps {
-//	games: Game[];
-//	isLoading?: boolean;
-//}
+import { request } from "@stacks/connect";
 
 const formSchema = z.object({
 	name: z.string().min(3, {
@@ -110,15 +100,14 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 			return;
 		}
 		if (values.withPool && values.amount) {
-			//createLobbyWithPool(values, executeCreateLobbyWithPool, user);
 			const clarityCode = getClarityCode(values.amount);
-			openContractDeploy({
+			await request("stx_deployContract", {
+				name: `${values.name}-stacks-wars`,
+				clarityCode,
 				network: "testnet",
-				userSession: userSession,
-				contractName: `${values.name}-stacks-wars`,
-				codeBody: clarityCode,
-				onFinish: async (response) => {
-					console.log(response, response.txId);
+			}).then(async (response) => {
+				if (response.txid) {
+					console.log(response, response.txid);
 					try {
 						await executeCreateLobbyWithPool({
 							lobby: {
@@ -132,7 +121,7 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 								entryAmount:
 									values.amount?.toString() as string,
 								maxPlayers: values.players,
-								deployContractTxId: response.txId,
+								deployContractTxId: response.txid,
 								lobbyId: gameId,
 							},
 						});
@@ -147,13 +136,12 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 								"An unknown error occurred",
 						});
 					}
-				},
-
-				onCancel: () => {
-					toast("Failed to create pool", {
-						description: "User cancelled transaction",
+				} else {
+					toast.error("Failed to deploy contract", {
+						description: "Please try again later",
 					});
-				},
+					console.error("Failed to deploy contract", response);
+				}
 			});
 		} else {
 			await executeCreateLobby({
