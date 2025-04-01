@@ -31,6 +31,7 @@ export default async function PoolDetailPage({
 	if (!lobby) {
 		notFound();
 	}
+
 	//const pool = await getPoolById(poolId);
 	//const deployTx = await getTransaction(pool?.deployTxId);
 	//const initializeTx = await getTransaction(pool?.initializeTxId);
