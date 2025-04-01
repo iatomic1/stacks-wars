@@ -9,6 +9,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { request } from "@stacks/connect";
+import { StxPostCondition } from "@stacks/transactions";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -29,14 +31,32 @@ export default function JoinLobbyForm({
 	isUserConnected = true,
 	lobbyId,
 }: JoinPoolFormProps) {
-	const router = useRouter();
+	//const router = useRouter();
 	const isLoading = false;
 	const isFull = currentPlayers >= maxPlayers;
 
-	const handleSubmit = () => {
-		console.log("Joining pool...");
+	const handleSubmit = async () => {
+		console.log("Joining pool with amount:", amount);
 		// Here you can add any additional logic needed when joining the pool
-		router.push(`/lexi-wars/${lobbyId}`);
+		const contract = `ST16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY2M1PXJ7.Flames-stacks-wars`; //replace with actual contract address
+		// replace with actual addy and amount
+		const stxPostCondition: StxPostCondition = {
+			type: "stx-postcondition",
+			address: "STF0V8KWBS70F0WDKTMY65B3G591NN52PR4Z71Y3",
+			condition: "eq",
+			amount: "100",
+		};
+		await request("stx_callContract", {
+			contract,
+			functionName: "join-pool",
+			functionArgs: [],
+			network: "testnet",
+			postConditionMode: "deny",
+			postConditions: [stxPostCondition],
+		}).then((response) => {
+			console.log("Get here");
+			console.log(response);
+		});
 	};
 
 	return (
