@@ -17,7 +17,7 @@ export default function LobbyStats({ lobby }: { lobby: Lobby }) {
 								Pool Size
 							</p>
 							<p className="text-base sm:text-xl md:text-2xl font-bold">
-								{lobby.pool.currentAmount} STX
+								{lobby.pool.currentAmount || 0} STX
 							</p>
 						</div>
 					</div>

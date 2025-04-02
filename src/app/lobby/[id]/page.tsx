@@ -119,14 +119,12 @@ export default async function PoolDetailPage({
 								>
 									<JoinLobbyForm
 										lobbyId={id}
-										amount={
-											lobby.pool.currentAmount /
-											lobby.pool.maxPlayers
-										}
+										amount={lobby.pool.entryAmount}
 										maxPlayers={lobby.maxPlayers}
 										currentPlayers={
 											lobby.participants.length
 										}
+										withPool={lobby.pool ? true : false}
 									/>
 								</Suspense>
 
