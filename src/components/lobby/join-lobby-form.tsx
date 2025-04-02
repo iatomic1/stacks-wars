@@ -12,7 +12,6 @@ import {
 import { request } from "@stacks/connect";
 import { StxPostCondition } from "@stacks/transactions";
 import { Loader } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 interface JoinPoolFormProps {
 	amount: number;
@@ -21,6 +20,7 @@ interface JoinPoolFormProps {
 	isUserJoined?: boolean;
 	isUserConnected?: boolean;
 	lobbyId: string;
+	withPool: boolean;
 }
 
 export default function JoinLobbyForm({
@@ -30,33 +30,42 @@ export default function JoinLobbyForm({
 	isUserJoined = false,
 	isUserConnected = true,
 	lobbyId,
+	withPool = false,
 }: JoinPoolFormProps) {
 	//const router = useRouter();
 	const isLoading = false;
 	const isFull = currentPlayers >= maxPlayers;
 
 	const handleSubmit = async () => {
-		console.log("Joining pool with amount:", amount);
+		console.log(`Joining lobby ${lobbyId} with amount:`, amount);
 		// Here you can add any additional logic needed when joining the pool
 		const contract = `ST16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY2M1PXJ7.Flames-stacks-wars`; //replace with actual contract address
 		// replace with actual addy and amount
-		const stxPostCondition: StxPostCondition = {
-			type: "stx-postcondition",
-			address: "STF0V8KWBS70F0WDKTMY65B3G591NN52PR4Z71Y3",
-			condition: "eq",
-			amount: "100",
-		};
-		await request("stx_callContract", {
-			contract,
-			functionName: "join-pool",
-			functionArgs: [],
-			network: "testnet",
-			postConditionMode: "deny",
-			postConditions: [stxPostCondition],
-		}).then((response) => {
-			console.log("Get here");
-			console.log(response);
-		});
+		if (withPool) {
+			try {
+				const stxPostCondition: StxPostCondition = {
+					type: "stx-postcondition",
+					address: "STF0V8KWBS70F0WDKTMY65B3G591NN52PR4Z71Y3",
+					condition: "eq",
+					amount: amount,
+				};
+
+				const response = await request("stx_callContract", {
+					contract,
+					functionName: "join-pool",
+					functionArgs: [],
+					network: "testnet",
+					postConditionMode: "deny",
+					postConditions: [stxPostCondition],
+				});
+				console.log("Transaction successfull:", response.txid);
+			} catch (error) {
+				console.error("Wallet returned an error:", error);
+				throw error;
+			}
+		}
+
+		// implement join pool logic here
 	};
 
 	return (
@@ -70,7 +79,7 @@ export default function JoinLobbyForm({
 			<CardContent>
 				<div className="space-y-4">
 					<p className="text-sm font-medium mb-1">Entry Fee</p>
-					<p className="text-2xl font-bold">{amount} STX</p>
+					<p className="text-2xl font-bold">{amount || 0} STX</p>
 				</div>
 			</CardContent>
 			<CardFooter>

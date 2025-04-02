@@ -152,6 +152,8 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 				creatorId: user.id,
 			});
 		}
+
+		// creator should join pool too
 	};
 
 	return (
