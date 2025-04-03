@@ -2,59 +2,88 @@
 import { revalidatePath } from "next/cache";
 import { createServerAction } from "zsa";
 import { lobbyInsertSchema } from "../db/schema/lobby";
-import { createLobby, createLobbyWithPool } from "../services/lobby";
+import { createLobby, createLobbyWithPool, joinLobby } from "../services/lobby";
 import { poolInsertSchema } from "../db/schema/pools";
 import { z } from "zod";
+const joinLobbySchema = z.object({
+  userId: z.string().uuid(),
+  lobbyId: z.string().uuid(),
+  stxAddress: z.string().min(1, "STX address is required"),
+  username: z.string().min(1, "Username is required"),
+  amount: z.number().optional().default(0),
+});
+
+const leaveLobbySchema = z.object({
+  userId: z.string().uuid(),
+  lobbyId: z.string().uuid(),
+});
 
 export const createLobbyAction = createServerAction()
-	.input(lobbyInsertSchema)
-	.handler(async ({ input }) => {
-		console.log("input received", input);
-		try {
-			const lobby = await createLobby(input);
-			revalidatePath("/lobby");
-			return { success: true, data: lobby };
-		} catch (error) {
-			console.error("Error creating lobby:", error);
-			return {
-				success: false,
-				error:
-					error instanceof Error
-						? error.message
-						: "Failed to create lobby",
-			};
-		}
-	});
+  .input(lobbyInsertSchema)
+  .handler(async ({ input }) => {
+    console.log("input received", input);
+    try {
+      const lobby = await createLobby(input);
+      revalidatePath("/lobby");
+      return { success: true, data: lobby };
+    } catch (error) {
+      console.error("Error creating lobby:", error);
+      return {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "Failed to create lobby",
+      };
+    }
+  });
 
 export const createLobbyWithPoolAction = createServerAction()
-	.input(
-		z.object({
-			lobby: lobbyInsertSchema,
-			pool: poolInsertSchema,
-		})
-	)
-	.handler(async ({ input }) => {
-		console.log("input received", input);
-		try {
-			const data = await createLobbyWithPool(input.lobby, input.pool);
-			revalidatePath("/lobby");
-			return {
-				success: true,
-				data: {
-					...data,
-				},
-			};
-		} catch (error) {
-			console.error("Error creating pool:", error);
-			return {
-				success: false,
-				error:
-					error instanceof Error
-						? error.message
-						: "Failed to create pool",
-			};
-		}
-	});
+  .input(
+    z.object({
+      lobby: lobbyInsertSchema,
+      pool: poolInsertSchema,
+    }),
+  )
+  .handler(async ({ input }) => {
+    console.log("input received", input);
+    try {
+      const data = await createLobbyWithPool(input.lobby, input.pool);
+      revalidatePath("/lobby");
+      return {
+        success: true,
+        data: {
+          ...data,
+        },
+      };
+    } catch (error) {
+      console.error("Error creating pool:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to create pool",
+      };
+    }
+  });
+
+export const joinLobbyAction = createServerAction()
+  .input(joinLobbySchema)
+  .handler(async ({ input }) => {
+    console.log("Join lobby input received:", input);
+    try {
+      const participant = await joinLobby(input);
+      revalidatePath(`/lobby/${input.lobbyId}`);
+      revalidatePath("/lobby");
+
+      return {
+        success: true,
+        data: participant,
+      };
+    } catch (error) {
+      console.error("Error joining lobby:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to join lobby",
+      };
+    }
+  });
 
 // export const updatePoolStatusAction = createServerAction()
 //  .input(
