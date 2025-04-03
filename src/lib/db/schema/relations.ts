@@ -1,3 +1,4 @@
+// schema/relations.ts
 import { relations } from "drizzle-orm";
 import { leaderboardEntries } from "./leaderboard-entries";
 import { users } from "./users";
