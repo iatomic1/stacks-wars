@@ -72,30 +72,6 @@ export async function getLobbyById(id: string) {
 
 		return {
 			...result,
-			status: result.status as
-				| "pending"
-				| "open"
-				| "completed"
-				| "cancelled",
-			creator: {
-				...result.creator,
-				ready: false, // TODO: Remove this
-				amount: 0, // TODO: Remove this
-			},
-			participants: result.participants.map((p) => ({
-				...p,
-				amount: Number(p.amount),
-			})),
-			game: {
-				...result.game,
-				tags: JSON.parse(result.game.tags),
-				totalPrize: Number(result.game.totalPrize),
-			},
-			pool: {
-				...result.pool,
-				currentAmount: Number(result.pool?.currentAmount),
-				entryAmount: Number(result.pool?.entryAmount),
-			},
 		};
 	} catch (error) {
 		console.error("Error getting lobby by ID:", error);

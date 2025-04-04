@@ -26,6 +26,10 @@ export const participantsRelations = relations(participants, ({ one }) => ({
 		fields: [participants.lobbyId],
 		references: [lobby.id],
 	}),
+	pool: one(pools, {
+		fields: [participants.poolId],
+		references: [pools.id],
+	}),
 }));
 
 export const lobbyRelations = relations(lobby, ({ one, many }) => ({
@@ -44,11 +48,12 @@ export const lobbyRelations = relations(lobby, ({ one, many }) => ({
 	participants: many(participants),
 }));
 
-export const poolsRelations = relations(pools, ({ one }) => ({
+export const poolsRelations = relations(pools, ({ one, many }) => ({
 	lobby: one(lobby, {
 		fields: [pools.lobbyId],
 		references: [lobby.id],
 	}),
+	participants: many(participants),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({

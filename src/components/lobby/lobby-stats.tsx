@@ -1,9 +1,9 @@
 import React from "react";
 import { Card, CardContent } from "../ui/card";
 import { Gamepad2, Trophy, Users } from "lucide-react";
-import { Lobby } from "@/types/lobbySchema";
+import { LobbySchema } from "@/types/lobbySchema";
 
-export default function LobbyStats({ lobby }: { lobby: Lobby }) {
+export default function LobbyStats({ lobby }: { lobby: LobbySchema }) {
 	return (
 		<div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
 			<Card className="bg-card/50 backdrop-blur-sm border-primary/10 hover:border-primary/20 transition-colors">
@@ -35,7 +35,8 @@ export default function LobbyStats({ lobby }: { lobby: Lobby }) {
 								Players
 							</p>
 							<p className="text-base sm:text-xl md:text-2xl font-bold">
-								{lobby.participants.length}/{lobby.maxPlayers}
+								{lobby.participants.length}/
+								{lobby.game.maxPlayers}
 							</p>
 						</div>
 					</div>
