@@ -96,6 +96,7 @@ export async function insertInitialGame() {
 		image: "/lexi-wars.webp",
 		activeLobbies: 10,
 		totalPrize: "0",
+		maxPlayers: 10,
 	};
 
 	try {

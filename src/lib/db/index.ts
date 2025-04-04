@@ -9,21 +9,21 @@ import * as relations from "./schema/relations";
 import * as lobby from "./schema/lobby";
 
 export const db = drizzle({
-  connection: {
-    url: env.DATABASE_URL,
-    ssl: false,
-    max: env.DB_MIGRATING || env.DB_SEEDING ? 1 : 1,
-    onnotice: env.DB_SEEDING ? () => {} : undefined,
-  },
-  casing: "snake_case",
-  logger: true,
-  schema: {
-    ...games,
-    ...users,
-    ...leaderboard,
-    ...participants,
-    ...lobby,
-    ...pools,
-    ...relations,
-  },
+	connection: {
+		url: env.DATABASE_URL,
+		ssl: false,
+		max: env.DB_MIGRATING || env.DB_SEEDING ? 1 : 1,
+		onnotice: env.DB_SEEDING ? () => {} : undefined,
+	},
+	casing: "snake_case",
+	logger: true,
+	schema: {
+		...games,
+		...users,
+		...leaderboard,
+		...participants,
+		...lobby,
+		...pools,
+		...relations,
+	},
 });
