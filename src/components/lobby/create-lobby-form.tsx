@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
 import { Loader } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -27,12 +26,14 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
-import { createLobbyAction } from "@/lib/actions/lobby";
+import { createLobbyAction, joinLobbyAction } from "@/lib/actions/lobby";
 import { useUser } from "@/context/UserContext";
-import { useCreateLobbyWithPool } from "@/hooks/useCreateLobbyWithPool";
 import { useRouter } from "next/navigation";
-import { getClarityCode } from "@/lib/pool-clarity-code";
-import { request } from "@stacks/connect";
+import { nanoid } from "nanoid";
+import { createGamePool } from "@/lib/actions/createGamePool";
+import { joinGamePool } from "@/lib/actions/joinGamePool";
+import { Lobby } from "@/lib/services/lobby";
+import { useState } from "react";
 
 const formSchema = z.object({
 	name: z.string().min(3, {
@@ -48,18 +49,11 @@ const formSchema = z.object({
 			message: "Amount must be at least 1 STX.",
 		})
 		.optional(),
-	players: z
-		.number()
-		.min(2, {
-			message: "At least 2 players are required.",
-		})
-		.max(10, {
-			message: "Maximum 10 players allowed.",
-		}),
 });
 
 export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 	const { user } = useUser();
+	const [lobbyData, setLobbyData] = useState<Lobby | null>(null);
 
 	const router = useRouter();
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -68,30 +62,58 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 			name: "",
 			description: "",
 			withPool: false,
-			amount: 100,
-			players: 10,
+			amount: undefined,
 		},
 	});
 
 	const withPool = form.watch("withPool");
 
-	const { isPending, execute: executeCreateLobby } = useServerAction(
-		createLobbyAction,
+	const { isPending: isLoading, execute: executeJoinLobby } = useServerAction(
+		joinLobbyAction,
 		{
 			onSuccess(args) {
+				console.log("Successfully joined the lobby");
 				const data = args.data.data;
-				if (data && data.id !== "") {
-					toast.success("Lobby created successfully");
-					router.push(`/lobby/${data.id}`);
+				if (data) {
+					toast.success("Successfully joined the lobby");
+					router.push(`/lobby/${data.lobbyId}`);
 				}
+			},
+			onError(error) {
+				console.error("Error joining lobby:", error);
+				toast.error("Failed to join lobby", {
+					description:
+						(error.err as Error).message ||
+						"An unknown error occurred",
+				});
 			},
 		}
 	);
 
-	const { isPending: isLoading, execute: executeCreateLobbyWithPool } =
-		useCreateLobbyWithPool();
+	const { isPending, execute: executeCreateLobby } = useServerAction(
+		createLobbyAction,
+		{
+			async onSuccess(args) {
+				const data = args.data.data;
+				if (data && data.id !== "") {
+					toast.success("Lobby created successfully");
+					setLobbyData(data);
+					console.log("lobbyData is alive", lobbyData);
+				}
+			},
+			onError(error) {
+				console.error("Error in executeCreateLobby:", error);
+				toast.error("Failed to create lobby", {
+					description:
+						(error.err as Error).message ||
+						"An unknown error occurred",
+				});
+			},
+		}
+	);
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
+		console.log(values);
 		if (!user?.id) {
 			toast.info("User not authenticated", {
 				description: "You must be logged in to create a Lobby",
@@ -99,61 +121,77 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 
 			return;
 		}
+
 		if (values.withPool && values.amount) {
-			const clarityCode = getClarityCode(values.amount);
-			await request("stx_deployContract", {
-				name: `${values.name}-stacks-wars`,
-				clarityCode,
-				network: "testnet",
-			}).then(async (response) => {
-				if (response.txid) {
-					console.log(response, response.txid);
-					try {
-						await executeCreateLobbyWithPool({
-							lobby: {
-								name: values.name,
-								description: values.description,
-								gameId: gameId,
-								maxPlayers: values.players,
-								creatorId: user.id,
-							},
-							pool: {
-								entryAmount:
-									values.amount?.toString() as string,
-								maxPlayers: values.players,
-								deployContractTxId: response.txid,
-								lobbyId: gameId,
-							},
-						});
-					} catch (error) {
-						console.error(
-							"Error in executeCreateLobbyWithPool:",
-							error
-						);
-						toast.error("Failed to create lobby with pool", {
-							description:
-								(error as Error).message ||
-								"An unknown error occurred",
-						});
-					}
-				} else {
-					toast.error("Failed to deploy contract", {
-						description: "Please try again later",
-					});
-					console.error("Failed to deploy contract", response);
-				}
+			toast.info("Trying to deploy your pool contract...", {
+				description: "wait for wallet confirmation",
 			});
+			const contractName = `${nanoid(5)}-stacks-wars`;
+			const contract: `${string}.${string}` = `${user.stxAddress}.${contractName}`;
+			const contractDeployResponse = await createGamePool(
+				values.amount,
+				contractName,
+				user.stxAddress
+			);
+			console.log(contractDeployResponse, contractDeployResponse.txid);
+			toast.info("Creating your lobby...");
+			await executeCreateLobby({
+				lobby: {
+					name: values.name,
+					description: values.description,
+					gameId: gameId,
+					creatorId: user.id,
+				},
+				pool: {
+					entryAmount: values.amount?.toString() as string,
+					deployContractTxId: contractDeployResponse.txid ?? "",
+					lobbyId: gameId,
+					contract,
+				},
+			});
+			console.log(lobbyData);
+			if (lobbyData) {
+				toast.info("Joining your pool...", {
+					description: "wait for wallet confirmation",
+				});
+				const joinPoolResponse = await joinGamePool(
+					contract,
+					user.stxAddress,
+					values.amount
+				);
+				console.log(joinPoolResponse, joinPoolResponse.txid);
+			} else {
+				console.log(
+					"An unknown error occurred, while joining the pool"
+				);
+				toast.error("Failed to create lobby", {
+					description: "Please try again",
+				});
+			}
 		} else {
 			await executeCreateLobby({
-				name: values.name,
-				description: values.description,
-				gameId: gameId,
-				maxPlayers: values.players,
-				creatorId: user.id,
+				lobby: {
+					name: values.name,
+					description: values.description,
+					gameId: gameId,
+					creatorId: user.id,
+				},
 			});
 		}
-
-		// creator should join pool too
+		toast.info("Please wait while we redirect you to the lobby");
+		if (lobbyData) {
+			await executeJoinLobby({
+				userId: user.id,
+				lobbyId: lobbyData.id,
+				stxAddress: user.stxAddress,
+				username: user.stxAddress,
+				amount: values.amount,
+			});
+		} else {
+			toast.error("Something went wrong while joining the lobby", {
+				description: "Please try again",
+			});
+		}
 	};
 
 	return (
@@ -207,45 +245,6 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 									<FormDescription>
 										Provide additional details about your
 										lobby
-									</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name="players"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Players</FormLabel>
-									<div className="space-y-2">
-										<FormControl>
-											<Slider
-												min={2}
-												max={10}
-												step={1}
-												value={[field.value]}
-												onValueChange={(value) =>
-													field.onChange(value[0])
-												}
-											/>
-										</FormControl>
-										<div className="flex justify-between">
-											<span className="text-sm text-muted-foreground">
-												2
-											</span>
-											<span className="font-medium">
-												{field.value} players
-											</span>
-											<span className="text-sm text-muted-foreground">
-												10
-											</span>
-										</div>
-									</div>
-									<FormDescription>
-										Set the maximum number of players for
-										your lobby
 									</FormDescription>
 									<FormMessage />
 								</FormItem>

@@ -1,4 +1,4 @@
-export const getClarityCode = (entryFee: number) => {
+export const getClarityCode = (entryFee: number, deployer: string) => {
 	return `
 ;; ==============================
 ;; Stacks Wars - Pool Contract
@@ -14,7 +14,7 @@ export const getClarityCode = (entryFee: number) => {
 (define-constant STACKS_WARS_FEE_WALLET 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; TODO: Replace with the actual signer before deployment
 (define-constant TRUSTED_PUBLIC_KEY 0x0390a5cac7c33fda49f70bc1b0866fa0ba7a9440d9de647fecb8132ceb76a94dfa)
 
-(define-constant DEPLOYER 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-constant DEPLOYER '${deployer})
 
 ;; Fixed entry fee for all players
 (define-constant ENTRY_FEE u${entryFee})
