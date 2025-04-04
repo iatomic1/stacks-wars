@@ -30,8 +30,8 @@ import { createLobbyAction, joinLobbyAction } from "@/lib/actions/lobby";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { nanoid } from "nanoid";
-import { createGamePool } from "@/lib/actions/createGamePool";
-import { joinGamePool } from "@/lib/actions/joinGamePool";
+import { createGamePool } from "@/lib/actions/create-game-pool";
+import { joinGamePool } from "@/lib/actions/join-game-pool";
 import { Lobby } from "@/lib/services/lobby";
 import { useState } from "react";
 
@@ -76,7 +76,7 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 				const data = args.data.data;
 				if (data) {
 					toast.success("Successfully joined the lobby");
-					router.push(`/lobby/${data.lobbyId}`);
+					router.replace(`/lobby/${data.lobbyId}`);
 				}
 			},
 			onError(error) {

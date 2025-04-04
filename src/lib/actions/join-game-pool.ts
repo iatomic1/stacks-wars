@@ -12,7 +12,7 @@ export const joinGamePool = async (
 			type: "stx-postcondition",
 			address,
 			condition: "eq",
-			amount,
+			amount: amount * 1000000,
 		};
 
 		return await request("stx_callContract", {
