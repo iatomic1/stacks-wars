@@ -76,7 +76,7 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 				const data = args.data.data;
 				if (data) {
 					toast.success("Successfully joined the lobby");
-					router.push(`/lobby/${data.lobbyId}`);
+					router.replace(`/lobby/${data.lobbyId}`);
 				}
 			},
 			onError(error) {

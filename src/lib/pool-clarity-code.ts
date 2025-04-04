@@ -17,7 +17,7 @@ export const getClarityCode = (entryFee: number, deployer: string) => {
 (define-constant DEPLOYER '${deployer})
 
 ;; Fixed entry fee for all players
-(define-constant ENTRY_FEE u${entryFee})
+(define-constant ENTRY_FEE u${entryFee}000000)
 ;; Fee percentage for the pool
 (define-constant FEE_PERCENTAGE u2)
 
