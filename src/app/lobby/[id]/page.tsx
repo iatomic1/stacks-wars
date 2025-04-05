@@ -22,29 +22,6 @@ export default async function PoolDetailPage({
 		notFound();
 	}
 
-	//const pool = await getPoolById(poolId);
-	//const deployTx = await getTransaction(pool?.deployTxId);
-	//const initializeTx = await getTransaction(pool?.initializeTxId);
-
-	// Transaction data
-	//const deployTx = {
-	//	tx_status: "success",
-	//	sender_address: "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
-	//};
-
-	//ts-ignore
-	//const initializeTx: SmartContractTransaction = {
-	//	tx_status: "success",
-	//	sender_address: "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
-	//	tx_id: "0x123",
-	//	nonce: 0,
-	//	fee_rate: "0.01",
-	//	sponsored: false,
-	//	post_condition_mode: "deny",
-	//	post_conditions: [],
-	//	anchor_mode: "any",
-	//};
-
 	return (
 		<div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
 			<main className="flex-1">
@@ -90,15 +67,7 @@ export default async function PoolDetailPage({
 										</div>
 									}
 								>
-									<JoinLobbyForm
-										lobbyId={id}
-										amount={lobby.pool.entryAmount}
-										maxPlayers={lobby.game.maxPlayers}
-										currentPlayers={
-											lobby.participants.length
-										}
-										withPool={false}
-									/>
+									<JoinLobbyForm lobby={lobby} />
 								</Suspense>
 
 								<GamePreview lobby={lobby} />

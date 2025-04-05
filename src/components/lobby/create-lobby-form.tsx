@@ -159,7 +159,7 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 					user.stxAddress,
 					values.amount
 				);
-				console.log(joinPoolResponse, joinPoolResponse.txid);
+				console.log("joinPoolResponse", joinPoolResponse.txid);
 			} else {
 				console.log(
 					"An unknown error occurred, while joining the pool"
