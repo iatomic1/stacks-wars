@@ -164,7 +164,10 @@ export default function LexiWars({ oppsData }: LexiWarsProps) {
 
 		// Word is valid, update game state
 		setUsedWords((prev) => new Set(prev).add(cleanWord));
-		const points = cleanWord.length;
+		const points =
+			cleanWord.length > minWordLength
+				? minWordLength + 2
+				: cleanWord.length;
 		setScore((prev) => prev + points);
 		setWord("");
 
