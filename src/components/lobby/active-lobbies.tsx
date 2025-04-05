@@ -13,6 +13,7 @@ import { truncateAddress } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Lobby } from "@/types/schema";
+import { getStxAddressByUserId } from "@/lib/services/users";
 
 export default async function ActiveLobbies({ lobbies }: { lobbies: Lobby[] }) {
 	return (
@@ -34,9 +35,16 @@ export default async function ActiveLobbies({ lobbies }: { lobbies: Lobby[] }) {
 						</div>
 						<CardDescription>
 							Created by{" "}
-							{lobby.creatorId
-								? truncateAddress(lobby.creatorId)
-								: "unknown user"}
+							{(() => {
+								const stxAddress = getStxAddressByUserId(
+									lobby.creatorId
+								);
+								return stxAddress.then((addr) =>
+									addr
+										? truncateAddress(addr)
+										: "unknown user"
+								);
+							})()}
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="pb-3">

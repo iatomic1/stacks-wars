@@ -41,12 +41,6 @@ export default function JoinLobbyForm({ lobby }: JoinPoolFormProps) {
 			return;
 		}
 
-		console.log(
-			`Joining lobby ${lobby.id} with amount:`,
-			lobby.pool.entryAmount
-		);
-		// Here you can add any additional logic needed when joining the pool
-
 		if (lobby.pool && lobby.pool.contract) {
 			const response = await joinGamePool(
 				lobby.pool.contract,
@@ -71,14 +65,16 @@ export default function JoinLobbyForm({ lobby }: JoinPoolFormProps) {
 					Join this lobby to participate in the game
 				</CardDescription>
 			</CardHeader>
-			<CardContent>
-				<div className="space-y-4">
-					<p className="text-sm font-medium mb-1">Entry Fee</p>
-					<p className="text-2xl font-bold">
-						{lobby.pool.entryAmount} STX
-					</p>
-				</div>
-			</CardContent>
+			{lobby.pool && (
+				<CardContent>
+					<div className="space-y-4">
+						<p className="text-sm font-medium mb-1">Entry Fee</p>
+						<p className="text-2xl font-bold">
+							{lobby.pool.entryAmount} STX
+						</p>
+					</div>
+				</CardContent>
+			)}
 			<CardFooter>
 				<Button
 					className="w-full"
