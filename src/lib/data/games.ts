@@ -1,12 +1,12 @@
-import { Game } from "@/types/schema";
+import { GameType } from "@/types/schema";
 
-export const games: Game[] = [
+export const games: GameType[] = [
 	{
 		id: "1",
 		name: "Lexi War",
 		description:
 			"Challenge players in our word-rule game and compete for STX rewards",
-		tags: `["Word game", "Strategy"]`,
+		tags: ["Word game", "Strategy"],
 		image: "/lexi-wars.webp",
 		activeLobbies: 10,
 		totalPrize: "0",

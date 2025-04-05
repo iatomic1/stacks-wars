@@ -2,9 +2,9 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Gamepad2, Users, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Game } from "@/types/schema";
+import { GameType } from "@/types/schema";
 
-export default function GameDetails({ game }: { game: Game | null }) {
+export default function GameDetails({ game }: { game: GameType | null }) {
 	if (!game) return null;
 	return (
 		<Card>
@@ -16,18 +16,12 @@ export default function GameDetails({ game }: { game: Game | null }) {
 					<div>
 						<CardTitle className="text-2xl">{game.name}</CardTitle>
 						<div className="flex gap-2 mt-2">
-							{/*{game.tags &&
-								JSON.parse(game.tags).map((tag: string) => (
+							{game.tags &&
+								game.tags.map((tag) => (
 									<Badge key={tag} variant="secondary">
 										{tag}
 									</Badge>
-								))}*/}
-							<Badge key={"Word Game"} variant="secondary">
-								Word Game
-							</Badge>
-							<Badge key={"Strategy Game"} variant="secondary">
-								Strategy Game
-							</Badge>
+								))}
 						</div>
 					</div>
 				</div>
