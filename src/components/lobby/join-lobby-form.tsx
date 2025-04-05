@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
 import { useJoinLobby } from "@/hooks/useJoinLobby";
-import { LobbySchema } from "@/types/lobbySchema";
+import { LobbySchema } from "@/types/schema";
 import { Loader } from "lucide-react";
 import { toast } from "sonner";
 import { isConnected } from "@stacks/connect";

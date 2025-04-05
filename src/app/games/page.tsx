@@ -1,6 +1,6 @@
 import { getAllGames } from "@/lib/services/games";
 import GameCard from "@/components/games/game-card";
-import { Game } from "@/types/lobbySchema";
+import { Game } from "@/types/schema";
 
 export default async function GamesPage() {
 	const games: Game[] = await getAllGames();

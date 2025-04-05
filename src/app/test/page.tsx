@@ -18,6 +18,7 @@ import { getClarityCode } from "@/lib/pool-clarity-code";
 import { request } from "@stacks/connect";
 //import { createGamePool } from "@/lib/wallet/createGamePool";
 import { generateWinnerSignature } from "@/lib/wallet/wallet";
+import { useUser } from "@/context/UserContext";
 
 const formSchema = z.object({
 	poolName: z.string().min(1, {
@@ -38,15 +39,13 @@ export default function TestPage() {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 	});
+	const { user } = useUser();
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		console.log(values);
-		const signature = generateWinnerSignature(
-			100,
-			"ST16VAAGEE7XE3DFZZSFDW7T5SCJR1N0WY2M1PXJ7"
-		);
+		const signature = generateWinnerSignature(100, user?.stxAddress ?? "");
 		console.log("Signature", signature);
-		const clarityCode = getClarityCode(100);
+		const clarityCode = getClarityCode(100, user?.stxAddress ?? "");
 		const response = await request("stx_deployContract", {
 			name: "stacks-wars-ts",
 			clarityCode,

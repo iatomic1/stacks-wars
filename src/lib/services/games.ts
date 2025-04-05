@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { games, gameInsertSchema } from "../db/schema/games";
 import { ZodError } from "zod";
-import { Game as GameType } from "@/types/lobbySchema";
+import { Game as GameType } from "@/types/schema";
 
 export type Game = typeof games.$inferSelect;
 export type NewGame = typeof games.$inferInsert;
@@ -26,7 +26,7 @@ export async function getGameById(id: string): Promise<GameType | null> {
 		return {
 			...result,
 			tags: JSON.parse(result.tags),
-			totalPrize: Number(result.totalPrize),
+			totalPrize: result.totalPrize,
 		};
 	} catch (error) {
 		throw new GameServiceError(`Failed to get game with ID ${id}`, error);
@@ -42,7 +42,7 @@ export async function getAllGames(): Promise<GameType[]> {
 		return result.map((game) => ({
 			...game,
 			tags: JSON.parse(game.tags),
-			totalPrize: Number(game.totalPrize),
+			totalPrize: game.totalPrize,
 		})) as GameType[];
 	} catch (error) {
 		throw new GameServiceError("Failed to fetch games", error);

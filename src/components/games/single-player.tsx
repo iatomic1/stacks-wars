@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PlayCircle } from "lucide-react";
-import { Game } from "@/types/lobbySchema";
+import { Game } from "@/types/schema";
 
 export default function SinglePlayer({ game }: { game: Game | null }) {
 	if (!game) return null;

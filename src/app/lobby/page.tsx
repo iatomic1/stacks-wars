@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import ActiveLobbies from "@/components/lobby/active-lobbies";
 //import { getAvailableLobbies, getLobbies } from "@/lib/services/lobby";
 import { getLobbies } from "@/lib/services/lobby";
-import { Lobby } from "@/types/lobbySchema";
+import { Lobby } from "@/types/schema";
 export default async function PoolsPage() {
 	//const lobbies = await getAvailableLobbies();
 	//console.log(JSON.stringify(lobbies, null, 2));

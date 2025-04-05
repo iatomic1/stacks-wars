@@ -1,4 +1,4 @@
-import { Game } from "@/types/lobbySchema";
+import { Game } from "@/types/schema";
 
 export const games: Game[] = [
 	{
@@ -6,12 +6,13 @@ export const games: Game[] = [
 		name: "Lexi War",
 		description:
 			"Challenge players in our word-rule game and compete for STX rewards",
-		tags: ["Word game", "Strategy"],
+		tags: `["Word game", "Strategy"]`,
 		image: "/lexi-wars.webp",
 		activeLobbies: 10,
-		totalPrize: 0,
+		totalPrize: "0",
 		createdAt: "2025-03-09T12:00:00Z",
 		updatedAt: "2025-03-09T12:00:00Z",
+		maxPlayers: 10,
 	},
 	//{
 	//	id: "2",

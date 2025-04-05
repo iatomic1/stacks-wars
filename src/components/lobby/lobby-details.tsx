@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardTitle, CardHeader } from "../ui/card";
 import { Progress } from "../ui/progress";
 import { Info } from "lucide-react";
-import { LobbySchema } from "@/types/lobbySchema";
+import { LobbySchema } from "@/types/schema";
 
 export default function LobbyDetails({ lobby }: { lobby: LobbySchema }) {
 	// Calculate participation percentage

@@ -8,7 +8,7 @@ import LobbyDetails from "@/components/lobby/lobby-details";
 import Participants from "@/components/lobby/participants";
 import GamePreview from "@/components/lobby/game-preview";
 import { getLobbyById } from "@/lib/services/lobby";
-import { LobbySchema } from "@/types/lobbySchema";
+import { LobbySchema } from "@/types/schema";
 
 export default async function PoolDetailPage({
 	params,

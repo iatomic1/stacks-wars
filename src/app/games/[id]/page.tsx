@@ -8,7 +8,7 @@ import GameDetails from "@/components/games/game-details";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SinglePlayer from "@/components/games/single-player";
 import { getGameById } from "@/lib/services/games";
-import { Game } from "@/types/lobbySchema";
+import { Game } from "@/types/schema";
 
 export default async function CreateGame({
 	params,
