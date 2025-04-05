@@ -200,7 +200,6 @@ export const joinLobby = async (input: JoinLobbyInput) => {
 
 		return {
 			...newParticipant,
-			amount: Number(newParticipant.amount),
 		};
 	});
 };

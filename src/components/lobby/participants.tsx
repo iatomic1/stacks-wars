@@ -4,8 +4,7 @@ import { User, Users } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { LobbySchema } from "@/types/schema";
-
-const EXPLORER_BASE_URL = "https://explorer.hiro.so/";
+import { EXPLORER_BASE_URL } from "@/lib/constants";
 
 export default function Participants({ lobby }: { lobby: LobbySchema }) {
 	return (

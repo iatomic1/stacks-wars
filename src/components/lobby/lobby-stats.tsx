@@ -4,7 +4,6 @@ import { Gamepad2, Trophy, Users } from "lucide-react";
 import { LobbySchema } from "@/types/schema";
 
 export default function LobbyStats({ lobby }: { lobby: LobbySchema }) {
-	console.log(lobby);
 	return (
 		<div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
 			{lobby.pool && (
