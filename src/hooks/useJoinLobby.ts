@@ -6,10 +6,11 @@ import { toast } from "sonner";
 export function useJoinLobby() {
 	const { isPending, execute } = useServerAction(joinLobbyAction, {
 		onSuccess(args) {
-			console.log("Successfully joined the lobby");
 			const data = args.data.data;
 			if (data) {
+				console.log("Successfully joined the lobby");
 				toast.success("Successfully joined the lobby");
+				console.log("Participant data:", data);
 			}
 		},
 		onError(error) {
