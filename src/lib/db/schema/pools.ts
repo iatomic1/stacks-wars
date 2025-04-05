@@ -3,6 +3,8 @@ import { TIMESTAMP, UUID } from "./utils";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { lobby } from "./lobby";
 
+type ContractAddress = `${string}.${string}`;
+
 export const pools = pgTable("pools", {
 	...UUID,
 	...TIMESTAMP,
@@ -12,7 +14,7 @@ export const pools = pgTable("pools", {
 		.unique(),
 	currentAmount: decimal({ precision: 10, scale: 2 }).notNull().default("0"),
 	entryAmount: decimal({ precision: 10, scale: 2 }).notNull(),
-	contract: text(),
+	contract: text().$type<ContractAddress | null>(),
 	deployContractTxId: text().notNull(),
 });
 

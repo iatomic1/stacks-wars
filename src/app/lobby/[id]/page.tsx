@@ -1,137 +1,81 @@
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Loader,
-  //Medal,
-} from "lucide-react";
+import { ArrowLeft, Loader } from "lucide-react";
 import JoinLobbyForm from "@/components/lobby/join-lobby-form";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-//import slugify from "react-slugify";
 import LobbyStats from "@/components/lobby/lobby-stats";
 import LobbyDetails from "@/components/lobby/lobby-details";
 import Participants from "@/components/lobby/participants";
 import GamePreview from "@/components/lobby/game-preview";
 import { getLobbyById } from "@/lib/services/lobby";
-import { Lobby } from "@/types/lobbySchema";
-//import { Badge } from "@/components/ui/badge";
-//import { getPoolById } from "@/lib/services/pools";
-//import getTransaction from "@/lib/services/transactions";
-//import { EXPLORER_BASE_URL } from "@/lib/constants";
-//import InitialisePool from "./_components/initialise-pool";
-//import { SmartContractTransaction } from "@/types/transaction";
+import { LobbySchema } from "@/types/lobbySchema";
 
 export default async function PoolDetailPage({
-  params,
+	params,
 }: {
-  params: Promise<{ id: string }>;
+	params: Promise<{ id: string }>;
 }) {
-  const id = (await params).id;
-  const lobby: Lobby | undefined = await getLobbyById(id);
-  if (!lobby) {
-    notFound();
-  }
+	const id = (await params).id;
 
-  //const pool = await getPoolById(poolId);
-  //const deployTx = await getTransaction(pool?.deployTxId);
-  //const initializeTx = await getTransaction(pool?.initializeTxId);
+	const lobby: LobbySchema | undefined = await getLobbyById(id);
+	if (!lobby) {
+		notFound();
+	}
 
-  // Transaction data
-  //const deployTx = {
-  //	tx_status: "success",
-  //	sender_address: "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
-  //};
+	return (
+		<div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
+			<main className="flex-1">
+				<div className="container max-w-7xl px-4 py-4 sm:px-6 sm:py-6">
+					<Link
+						href="/lobby"
+						className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4 sm:mb-6"
+					>
+						<ArrowLeft className="h-4 w-4" />
+						<span>Back to Lobby</span>
+					</Link>
 
-  //ts-ignore
-  //const initializeTx: SmartContractTransaction = {
-  //	tx_status: "success",
-  //	sender_address: "ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5",
-  //	tx_id: "0x123",
-  //	nonce: 0,
-  //	fee_rate: "0.01",
-  //	sponsored: false,
-  //	post_condition_mode: "deny",
-  //	post_conditions: [],
-  //	anchor_mode: "any",
-  //};
+					{/* Hero Section */}
+					<div className="mb-6 sm:mb-8 space-y-2 sm:space-y-3">
+						<div className="flex flex-wrap items-start justify-between gap-2">
+							<h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight break-words">
+								{lobby.name}
+							</h1>
+						</div>
+						<p className="text-sm sm:text-base text-muted-foreground max-w-3xl break-words">
+							{lobby.description}
+						</p>
+					</div>
 
-  return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
-      <main className="flex-1">
-        <div className="container max-w-7xl px-4 py-4 sm:px-6 sm:py-6">
-          <Link
-            href="/lobby"
-            className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4 sm:mb-6"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to Lobby</span>
-          </Link>
+					<div className="grid gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-3">
+						{/* Main Content */}
+						<div className="lg:col-span-2 space-y-4 sm:space-y-6 lg:space-y-8">
+							{/* Stats Cards */}
+							<LobbyStats lobby={lobby} />
 
-          {/* Hero Section */}
-          <div className="mb-6 sm:mb-8 space-y-2 sm:space-y-3">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight break-words">
-                {lobby.name}
-              </h1>
-              {/*{deployTx?.tx_status === "success" &&
-								initializeTx?.tx_status !== "success" && (
-									<InitialisePool
-										poolCreatorAddress={
-											pool.creator.stxAddress
-										}
-										txSenderAddress={
-											deployTx?.sender_address as string
-										}
-										poolName={pool.name}
-										maxPlayers={pool.maxPlayers}
-										totalPrize={Number.parseFloat(
-											pool.amount
-										)}
-										poolId={pool.id}
-									/>
-								)}*/}
-            </div>
-            <p className="text-sm sm:text-base text-muted-foreground max-w-3xl break-words">
-              {lobby.description}
-            </p>
-          </div>
+							{/* Lobby Details */}
+							<LobbyDetails lobby={lobby} />
 
-          <div className="grid gap-4 sm:gap-6 lg:gap-8 lg:grid-cols-3">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-4 sm:space-y-6 lg:space-y-8">
-              {/* Stats Cards */}
-              <LobbyStats lobby={lobby} />
+							<Participants lobby={lobby} />
+						</div>
 
-              {/* Lobby Details */}
-              <LobbyDetails lobby={lobby} />
+						<div className="space-y-4 sm:space-y-6">
+							<div className="lg:sticky lg:top-6 flex flex-col gap-4">
+								<Suspense
+									fallback={
+										<div className="flex justify-center items-center py-6 sm:py-8">
+											<Loader className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-muted-foreground" />
+										</div>
+									}
+								>
+									<JoinLobbyForm lobby={lobby} />
+								</Suspense>
 
-              <Participants lobby={lobby} />
-            </div>
-
-            <div className="space-y-4 sm:space-y-6">
-              <div className="lg:sticky lg:top-6 flex flex-col gap-4">
-                <Suspense
-                  fallback={
-                    <div className="flex justify-center items-center py-6 sm:py-8">
-                      <Loader className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-muted-foreground" />
-                    </div>
-                  }
-                >
-                  <JoinLobbyForm
-                    lobbyId={id}
-                    amount={lobby.pool.entryAmount}
-                    maxPlayers={lobby.maxPlayers}
-                    currentPlayers={lobby.participants.length}
-                    withPool={false}
-                  />
-                </Suspense>
-
-                <GamePreview lobby={lobby} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
+								<GamePreview lobby={lobby} />
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+	);
 }

@@ -3,11 +3,11 @@ import { Card, CardContent, CardTitle, CardHeader } from "../ui/card";
 import { User, Users } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { Lobby } from "@/types/lobbySchema";
+import { LobbySchema } from "@/types/lobbySchema";
 
-//const EXPLORER_BASE_URL = "https://explorer.stacks.co/";
+const EXPLORER_BASE_URL = "https://explorer.hiro.so/";
 
-export default function Participants({ lobby }: { lobby: Lobby }) {
+export default function Participants({ lobby }: { lobby: LobbySchema }) {
 	return (
 		<Card className="overflow-hidden">
 			<CardHeader className="bg-muted/30 p-4 pb-3 sm:p-6 sm:pb-4">
@@ -40,7 +40,7 @@ export default function Participants({ lobby }: { lobby: Lobby }) {
 											<p className="text-sm sm:text-base font-medium truncate max-w-[120px] xs:max-w-[160px] sm:max-w-[200px] md:max-w-[300px]">
 												{participant.username}
 											</p>
-											<span
+											{/*<span
 												className={`text-xs px-2 py-0.5 rounded-full ${
 													participant.ready
 														? "bg-green-500/10 text-green-500"
@@ -50,6 +50,11 @@ export default function Participants({ lobby }: { lobby: Lobby }) {
 												{participant.ready
 													? "Ready"
 													: "Not Ready"}
+											</span>*/}
+											<span
+												className={`text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500`}
+											>
+												Ready
 											</span>
 										</div>
 										<p className="text-xs text-muted-foreground">
@@ -68,9 +73,8 @@ export default function Participants({ lobby }: { lobby: Lobby }) {
 										className="!p-0 text-right"
 									>
 										<Link
-											//href={`${EXPLORER_BASE_URL}txid/${participant.txId}`}
-											href={""}
-											//target="_blank"
+											href={`${EXPLORER_BASE_URL}txid/${participant.txId}?chain=testnet`}
+											target="_blank"
 										>
 											Veiw in explorer
 										</Link>

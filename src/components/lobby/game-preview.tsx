@@ -9,9 +9,9 @@ import {
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { ChevronRight } from "lucide-react";
-import { Lobby } from "@/types/lobbySchema";
+import { LobbySchema } from "@/types/lobbySchema";
 
-export default function GamePreview({ lobby }: { lobby: Lobby }) {
+export default function GamePreview({ lobby }: { lobby: LobbySchema }) {
 	return (
 		<Card className="overflow-hidden">
 			<CardHeader className="p-4 pb-2 sm:p-6 sm:pb-3">
