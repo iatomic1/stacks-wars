@@ -25,7 +25,7 @@ export async function getGameById(id: string): Promise<GameType | null> {
 		if (!result) return null;
 		return {
 			...result,
-			tags: JSON.parse(result.tags),
+			tags: JSON.parse(result.tags.replace(/'/g, '"')),
 			totalPrize: result.totalPrize,
 		};
 	} catch (error) {
