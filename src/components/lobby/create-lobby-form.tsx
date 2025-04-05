@@ -26,7 +26,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
-import { createLobbyAction, joinLobbyAction } from "@/lib/actions/lobby";
+import { createLobbyAction } from "@/lib/actions/lobby";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { nanoid } from "nanoid";
@@ -34,6 +34,7 @@ import { createGamePool } from "@/lib/actions/create-game-pool";
 import { joinGamePool } from "@/lib/actions/join-game-pool";
 import { Lobby } from "@/lib/services/lobby";
 import { useState } from "react";
+import { useJoinLobby } from "@/hooks/useJoinLobby";
 
 const formSchema = z.object({
 	name: z.string().min(3, {
@@ -54,6 +55,7 @@ const formSchema = z.object({
 export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 	const { user } = useUser();
 	const [lobbyData, setLobbyData] = useState<Lobby | null>(null);
+	const { joinLobby, isJoining } = useJoinLobby();
 
 	const router = useRouter();
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -67,28 +69,6 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 	});
 
 	const withPool = form.watch("withPool");
-
-	const { isPending: isLoading, execute: executeJoinLobby } = useServerAction(
-		joinLobbyAction,
-		{
-			onSuccess(args) {
-				console.log("Successfully joined the lobby");
-				const data = args.data.data;
-				if (data) {
-					toast.success("Successfully joined the lobby");
-					router.replace(`/lobby/${data.lobbyId}`);
-				}
-			},
-			onError(error) {
-				console.error("Error joining lobby:", error);
-				toast.error("Failed to join lobby", {
-					description:
-						(error.err as Error).message ||
-						"An unknown error occurred",
-				});
-			},
-		}
-	);
 
 	const { isPending, execute: executeCreateLobby } = useServerAction(
 		createLobbyAction,
@@ -180,13 +160,14 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 		}
 		toast.info("Please wait while we redirect you to the lobby");
 		if (lobbyData) {
-			await executeJoinLobby({
+			await joinLobby({
 				userId: user.id,
 				lobbyId: lobbyData.id,
 				stxAddress: user.stxAddress,
 				username: user.stxAddress,
 				amount: values.amount,
 			});
+			router.replace(`/lobby/${lobbyData.id}`);
 		} else {
 			toast.error("Something went wrong while joining the lobby", {
 				description: "Please try again",
@@ -307,14 +288,14 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 						<Button variant="outline" asChild>
 							<Link href="/games">Cancel</Link>
 						</Button>
-						<Button type="submit" disabled={isPending || isLoading}>
-							{(isPending || isLoading) && (
+						<Button type="submit" disabled={isPending || isJoining}>
+							{(isPending || isJoining) && (
 								<Loader
 									className="h-4 w-4 mr-1 animate-spin"
 									size={17}
 								/>
 							)}
-							{isPending || isLoading
+							{isPending || isJoining
 								? "Creating..."
 								: "Create Lobby"}
 						</Button>
