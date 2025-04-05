@@ -9,7 +9,7 @@ import {
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { ChevronRight } from "lucide-react";
-import { LobbySchema } from "@/types/lobbySchema";
+import { LobbySchema } from "@/types/schema";
 
 export default function GamePreview({ lobby }: { lobby: LobbySchema }) {
 	return (

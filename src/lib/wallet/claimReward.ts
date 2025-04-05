@@ -20,7 +20,7 @@ export const claimPoolReward = async (
 	try {
 		console.log(`Claiming reward for pool ${poolId} with amount ${amount}`);
 
-		const signature = await generateWinnerSignature(poolId, winner, amount);
+		const signature = await generateWinnerSignature(amount, winner);
 
 		const txOptions: SignedContractCallOptions = {
 			contractAddress,

@@ -3,7 +3,7 @@ import { Card, CardContent, CardTitle, CardHeader } from "../ui/card";
 import { User, Users } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { LobbySchema } from "@/types/lobbySchema";
+import { LobbySchema } from "@/types/schema";
 
 const EXPLORER_BASE_URL = "https://explorer.hiro.so/";
 

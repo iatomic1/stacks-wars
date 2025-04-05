@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "../ui/card";
 import { Gamepad2, Trophy, Users } from "lucide-react";
-import { LobbySchema } from "@/types/lobbySchema";
+import { LobbySchema } from "@/types/schema";
 
 export default function LobbyStats({ lobby }: { lobby: LobbySchema }) {
 	return (
