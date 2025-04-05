@@ -1,9 +1,9 @@
 import { getAllGames } from "@/lib/services/games";
 import GameCard from "@/components/games/game-card";
-import { Game } from "@/types/schema";
+import { GameType } from "@/types/schema";
 
 export default async function GamesPage() {
-	const games: Game[] = await getAllGames();
+	const games: GameType[] = await getAllGames();
 
 	return (
 		<div className="flex min-h-screen flex-col">

@@ -11,9 +11,9 @@ import { Trophy, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { Game } from "@/types/schema";
+import { GameType } from "@/types/schema";
 
-export default function GameCard({ game }: { game: Game }) {
+export default function GameCard({ game }: { game: GameType }) {
 	return (
 		<Card className="overflow-hidden">
 			<div className="md:grid md:grid-cols-[1fr_300px] md:gap-6">
@@ -24,8 +24,8 @@ export default function GameCard({ game }: { game: Game }) {
 								{game.name}
 							</CardTitle>
 							<CardDescription className="mt-1">
-								{/*{game.tags &&
-									JSON.parse(game.tags).map((tag: string) => (
+								{game.tags &&
+									game.tags.map((tag) => (
 										<Badge
 											variant="outline"
 											key={tag}
@@ -33,21 +33,7 @@ export default function GameCard({ game }: { game: Game }) {
 										>
 											{tag}
 										</Badge>
-									))}*/}
-								<Badge
-									variant="outline"
-									key={"Word Game"}
-									className="mr-2"
-								>
-									Word Game
-								</Badge>
-								<Badge
-									variant="outline"
-									key={"Strategy Game"}
-									className="mr-2"
-								>
-									Strategy Game
-								</Badge>
+									))}
 							</CardDescription>
 						</div>
 					</CardHeader>
