@@ -33,8 +33,8 @@ import { nanoid } from "nanoid";
 import { createGamePool } from "@/lib/actions/create-game-pool";
 import { joinGamePool } from "@/lib/actions/join-game-pool";
 import { Lobby } from "@/lib/services/lobby";
-import { useState } from "react";
 import { useJoinLobby } from "@/hooks/useJoinLobby";
+import { useState } from "react";
 
 const formSchema = z.object({
 	name: z.string().min(3, {
@@ -54,8 +54,9 @@ const formSchema = z.object({
 
 export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 	const { user } = useUser();
-	const [lobbyData, setLobbyData] = useState<Lobby | null>(null);
 	const { joinLobby, isJoining } = useJoinLobby();
+	const [lobbyData, setLobbyData] = useState<Lobby | undefined>(undefined);
+	//let lobbyData: Lobby | undefined;
 
 	const router = useRouter();
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -73,11 +74,11 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 	const { isPending, execute: executeCreateLobby } = useServerAction(
 		createLobbyAction,
 		{
-			async onSuccess(args) {
-				const data = args.data.data;
-				if (data && data.id !== "") {
+			onSuccess(args) {
+				//lobbyData = args.data.data;
+				setLobbyData(args.data.data);
+				if (lobbyData && lobbyData.id !== "") {
 					toast.success("Lobby created successfully");
-					setLobbyData(data);
 					console.log("lobbyData is alive", lobbyData);
 				}
 			},
@@ -158,8 +159,9 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 				},
 			});
 		}
-		toast.info("Please wait while we redirect you to the lobby");
-		if (lobbyData) {
+		console.log(lobbyData);
+		if (lobbyData && lobbyData.id) {
+			toast.info("Please wait while we redirect you to the lobby");
 			await joinLobby({
 				userId: user.id,
 				lobbyId: lobbyData.id,
