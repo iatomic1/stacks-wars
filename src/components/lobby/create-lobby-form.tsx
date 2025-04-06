@@ -55,8 +55,7 @@ const formSchema = z.object({
 export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 	const { user } = useUser();
 	const { joinLobby, isJoining } = useJoinLobby();
-	const [lobbyData, setLobbyData] = useState<Lobby | undefined>(undefined);
-	//let lobbyData: Lobby | undefined;
+	const [poolAmount, setPoolAmount] = useState<number | undefined>(undefined);
 
 	const router = useRouter();
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -74,12 +73,49 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 	const { isPending, execute: executeCreateLobby } = useServerAction(
 		createLobbyAction,
 		{
-			onSuccess(args) {
-				//lobbyData = args.data.data;
-				setLobbyData(args.data.data);
+			async onSuccess(args) {
+				const lobbyData: Lobby | undefined = args.data.data;
 				if (lobbyData && lobbyData.id !== "") {
 					toast.success("Lobby created successfully");
 					console.log("lobbyData is alive", lobbyData);
+					if (!user?.id) {
+						toast.info("User not authenticated", {
+							description:
+								"You must be logged in to join a Lobby",
+						});
+
+						return;
+					}
+
+					if (poolAmount) {
+						const contractName = `${nanoid(5)}-stacks-wars`;
+						const contract: `${string}.${string}` = `${user.stxAddress}.${contractName}`;
+						toast.info("Joining your pool...", {
+							description: "wait for wallet confirmation",
+						});
+						const joinPoolResponse = await joinGamePool(
+							contract,
+							user.stxAddress,
+							poolAmount
+						);
+						console.log("joinPoolResponse", joinPoolResponse.txid);
+					}
+
+					toast.info(
+						"Please wait while we redirect you to the lobby"
+					);
+					await joinLobby({
+						userId: user.id,
+						lobbyId: lobbyData.id,
+						stxAddress: user.stxAddress,
+						username: user.stxAddress,
+						amount: poolAmount,
+					});
+					router.replace(`/lobby/${lobbyData.id}`);
+				} else {
+					toast.error("Please try again", {
+						description: "An Unknown error occured",
+					});
 				}
 			},
 			onError(error) {
@@ -130,25 +166,7 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 					contract,
 				},
 			});
-			console.log(lobbyData);
-			if (lobbyData) {
-				toast.info("Joining your pool...", {
-					description: "wait for wallet confirmation",
-				});
-				const joinPoolResponse = await joinGamePool(
-					contract,
-					user.stxAddress,
-					values.amount
-				);
-				console.log("joinPoolResponse", joinPoolResponse.txid);
-			} else {
-				console.log(
-					"An unknown error occurred, while joining the pool"
-				);
-				toast.error("Failed to create lobby", {
-					description: "Please try again",
-				});
-			}
+			setPoolAmount(values.amount);
 		} else {
 			await executeCreateLobby({
 				lobby: {
@@ -157,22 +175,6 @@ export default function CreateLobbyForm({ gameId }: { gameId: string }) {
 					gameId: gameId,
 					creatorId: user.id,
 				},
-			});
-		}
-		console.log(lobbyData);
-		if (lobbyData && lobbyData.id) {
-			toast.info("Please wait while we redirect you to the lobby");
-			await joinLobby({
-				userId: user.id,
-				lobbyId: lobbyData.id,
-				stxAddress: user.stxAddress,
-				username: user.stxAddress,
-				amount: values.amount,
-			});
-			router.replace(`/lobby/${lobbyData.id}`);
-		} else {
-			toast.error("Something went wrong while joining the lobby", {
-				description: "Please try again",
 			});
 		}
 	};
