@@ -3,8 +3,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ArrowLeft, User } from "lucide-react";
-import Link from "next/link";
 import { toast } from "sonner";
 import GameRule from "@/components/lexi-wars/game-rule";
 import GameTimer from "@/components/lexi-wars/game-timer";
@@ -16,6 +14,8 @@ import words from "an-array-of-english-words";
 import { gameDb } from "@/lib/game-db";
 import { rules } from "@/lib/lexiValidationRule";
 import { cn } from "@/lib/utils";
+import BackToGames from "./back-to-games";
+import TurnIndicator from "./turn-indicator";
 
 interface OppsData {
 	username: string;
@@ -48,7 +48,7 @@ export default function LexiWars({ oppsData }: LexiWarsProps) {
 	const [showGameOver, setShowGameOver] = useState(false);
 	const [isNewHighScore, setIsNewHighScore] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
-	const [isMultiplayer, setIsMultiplayer] = useState(false);
+	//const [isMultiplayer, setIsMultiplayer] = useState(false);
 
 	// Detect mobile device and set multiplayer state
 	useEffect(() => {
@@ -57,7 +57,7 @@ export default function LexiWars({ oppsData }: LexiWarsProps) {
 				navigator.userAgent
 			)
 		);
-		setIsMultiplayer(Boolean(oppsData && oppsData.length > 0));
+		//setIsMultiplayer(Boolean(oppsData && oppsData.length > 0));
 	}, [oppsData]);
 
 	// Update rules when minWordLength or randomLetter changes
@@ -164,7 +164,10 @@ export default function LexiWars({ oppsData }: LexiWarsProps) {
 
 		// Word is valid, update game state
 		setUsedWords((prev) => new Set(prev).add(cleanWord));
-		const points = cleanWord.length;
+		const points =
+			cleanWord.length > minWordLength
+				? minWordLength + 2
+				: cleanWord.length;
 		setScore((prev) => prev + points);
 		setWord("");
 
@@ -266,13 +269,7 @@ export default function LexiWars({ oppsData }: LexiWarsProps) {
 						"container max-w-3xl px-4 py-4 sm:px-6 sm:py-6"
 					)}
 				>
-					<Link
-						href="/games"
-						className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4 sm:mb-6"
-					>
-						<ArrowLeft className="h-4 w-4" />
-						<span>Back to Games</span>
-					</Link>
+					<BackToGames />
 
 					<div className="space-y-4 select-none">
 						<GameHeader score={score} highScore={highScore} />
@@ -289,41 +286,7 @@ export default function LexiWars({ oppsData }: LexiWarsProps) {
 						<Card className="border-2 border-primary/10">
 							<CardHeader className="p-4">
 								{/* Turn Indicator */}
-								<div
-									className={`p-4 rounded-lg border-2 ${
-										isMultiplayer
-											? "bg-yellow-500/10 border-yellow-500/20"
-											: "bg-green-500/10 border-green-500/20"
-									}`}
-								>
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-2">
-											<User
-												className={`h-5 w-5 ${
-													isMultiplayer
-														? "text-yellow-500"
-														: "text-green-500"
-												}`}
-											/>
-											<h3
-												className={`text-base font-semibold ${
-													isMultiplayer
-														? "text-yellow-500"
-														: "text-green-500"
-												}`}
-											>
-												{isMultiplayer
-													? "Waiting for Your Turn..."
-													: "It's Your Turn!"}
-											</h3>
-										</div>
-										{isMultiplayer && (
-											<div className="text-sm text-muted-foreground">
-												Next: VocabVirtuoso
-											</div>
-										)}
-									</div>
-								</div>
+								<TurnIndicator />
 							</CardHeader>
 							<CardContent className="p-4">
 								{/* Input Form */}
@@ -354,7 +317,6 @@ export default function LexiWars({ oppsData }: LexiWarsProps) {
 						highScore={previousHighScore}
 						isNewHighScore={isNewHighScore}
 						onPlayAgain={startGame}
-						playerScores={oppsData}
 					/>
 
 					<div className="sr-only" role="alert">

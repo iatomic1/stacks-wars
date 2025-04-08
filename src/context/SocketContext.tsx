@@ -39,7 +39,7 @@ interface GameState {
 	requiredRepeats: number;
 }
 
-interface SocketContextType {
+export interface SocketContextType {
 	socket: Socket | null;
 	isConnected: boolean;
 	roomData: RoomData | null;

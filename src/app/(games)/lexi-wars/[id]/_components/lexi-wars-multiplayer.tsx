@@ -1,9 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ArrowLeft, User as UserIcon } from "lucide-react";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import GameRule from "@/components/lexi-wars/game-rule";
 import GameTimer from "@/components/lexi-wars/game-timer";
 import GameHeader from "@/components/lexi-wars/game-header";
@@ -12,7 +9,11 @@ import KeyboardComp from "@/components/lexi-wars/keyboard-comp";
 import { cn } from "@/lib/utils";
 import { useSocketContext } from "@/context/SocketContext";
 import { User } from "@/lib/services/users";
-import GameOverModal from "./multiplayer-game-over-modal";
+import GameOverModal from "@/components/lexi-wars/multiplayer-game-over-modal";
+import BackToGames from "@/components/lexi-wars/back-to-games";
+import TurnIndicator from "@/components/lexi-wars/turn-indicator";
+import { useRouter } from "next/navigation";
+import PlayersGameHistory from "@/components/lexi-wars/players-game-history";
 
 export default function LexiWarsMultiplayer({
 	id,
@@ -35,6 +36,7 @@ export default function LexiWarsMultiplayer({
 	const [word, setWord] = useState("");
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [isMobile, setIsMobile] = useState(false);
+	const router = useRouter();
 
 	const currentPlayer = roomData?.players.find(
 		(p) => p.username === username
@@ -82,23 +84,17 @@ export default function LexiWarsMultiplayer({
 						"container max-w-6xl px-4 py-4 sm:px-6 sm:py-6"
 					)}
 				>
-					<Link
-						href="/games"
-						className="inline-flex items-center gap-1 text-sm mb-4"
-					>
-						<ArrowLeft className="h-4 w-4" />
-						<span>Back to Games</span>
-					</Link>
+					<BackToGames />
 
 					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 						{/* Game Area */}
-						<div className="lg:col-span-2 space-y-4">
-							<div className="flex justify-between items-center relative">
-								<GameHeader
-									score={currentPlayer?.score || 0}
-									highScore={20}
-								/>
-								<Badge
+						<div className="lg:col-span-2 space-y-4 select-none">
+							{/*<div className="flex justify-between items-center relative">*/}
+							<GameHeader
+								score={currentPlayer?.score || 0}
+								highScore={20}
+							/>
+							{/*<Badge
 									variant={
 										gameState.isPlaying
 											? "default"
@@ -108,8 +104,7 @@ export default function LexiWarsMultiplayer({
 									{gameState.isPlaying
 										? "In Progress"
 										: "Waiting"}
-								</Badge>
-							</div>
+								</Badge>*/}
 
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<GameRule
@@ -122,36 +117,10 @@ export default function LexiWarsMultiplayer({
 
 							<Card className="border-2 border-primary/10">
 								<CardHeader className="p-4">
-									<div
-										className={`p-4 rounded-lg border-2 ${
-											isCurrentPlayer
-												? "bg-green-500/10 border-green-500/20"
-												: "bg-yellow-500/10"
-										}`}
-									>
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-2">
-												<UserIcon
-													className={`h-5 w-5 ${
-														isCurrentPlayer
-															? "text-green-500"
-															: "text-yellow-500"
-													}`}
-												/>
-												<h3
-													className={`text-base font-semibold ${
-														isCurrentPlayer
-															? "text-green-500"
-															: "text-yellow-500"
-													}`}
-												>
-													{isCurrentPlayer
-														? "Your Turn!"
-														: `Waiting for ${gameState.currentPlayer}`}
-												</h3>
-											</div>
-										</div>
-									</div>
+									<TurnIndicator
+										isCurrentPlayer={isCurrentPlayer}
+										currentPlayer={gameState.currentPlayer}
+									/>
 								</CardHeader>
 								<CardContent className="p-4">
 									{isEliminated ? (
@@ -183,70 +152,11 @@ export default function LexiWarsMultiplayer({
 							</Card>
 						</div>
 
-						{/* Players & History */}
-						<div className="lg:col-span-1 space-y-6">
-							<Card>
-								<CardHeader>
-									<h3 className="text-lg font-semibold">
-										Players
-									</h3>
-									<p>{roomData.players.length} players</p>
-								</CardHeader>
-								<CardContent className="space-y-2">
-									{roomData.players.map((player) => (
-										<div
-											key={player.username}
-											className={cn(
-												"p-3 border rounded-md relative",
-												player.eliminated &&
-													"bg-destructive/10 border-destructive/20",
-												player.isCurrentPlayer &&
-													"bg-primary/10"
-											)}
-										>
-											<div className="flex justify-between items-center">
-												<div>
-													{player.username}
-													{player.eliminated && (
-														<Badge
-															variant="destructive"
-															className="ml-2"
-														>
-															Eliminated
-														</Badge>
-													)}
-												</div>
-												<div>{player.score} pts</div>
-											</div>
-											{player.id === user.id && (
-												<Badge className="absolute -top-3 right-1">
-													You
-												</Badge>
-											)}
-										</div>
-									))}
-								</CardContent>
-							</Card>
-
-							<Card>
-								<CardHeader>
-									<h3 className="text-lg font-semibold">
-										History
-									</h3>
-								</CardHeader>
-								<CardContent className="max-h-[300px] overflow-y-auto">
-									{gameHistory.map((entry, i) => (
-										<div
-											key={i}
-											className="flex justify-between p-2 border-b"
-										>
-											<div>{entry.word}</div>
-											<Badge>{entry.points} pts</Badge>
-										</div>
-									))}
-								</CardContent>
-							</Card>
-						</div>
+						<PlayersGameHistory
+							gameHistory={gameHistory}
+							roomData={roomData}
+							user={user}
+						/>
 					</div>
 
 					{isMobile && isCurrentPlayer && (
@@ -260,7 +170,9 @@ export default function LexiWarsMultiplayer({
 						score={currentPlayer?.score as number}
 						onClose={() => setShowGameOver(false)}
 						onPlayAgain={() => console.log("Play again clicked")}
-						onBackToMenu={() => console.log("Back to menu clicked")}
+						onBackToLobby={() => {
+							router.push("/lobby");
+						}}
 						playerScores={roomData.players}
 						user={user}
 					/>
