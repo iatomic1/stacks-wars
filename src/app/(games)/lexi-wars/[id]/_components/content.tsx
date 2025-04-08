@@ -6,8 +6,15 @@ import { useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import LexiWarsMultiplayer from "./lexi-wars-multiplayer";
 import { useRouter } from "next/navigation";
+import { Participant } from "@/types/schema";
 
-export default function Content({ id }: { id: string }) {
+export default function Content({
+	id,
+	participants,
+}: {
+	id: string;
+	participants: Participant[];
+}) {
 	const { joinRoom, roomData, socket } = useSocketContext();
 	const { user } = useUser();
 	const hasJoinedRef = useRef(false);
@@ -19,28 +26,17 @@ export default function Content({ id }: { id: string }) {
 			return false;
 		}
 
-		try {
-			// Make a server action call to check participation
-			const response = await fetch(
-				`/api/lobby/${id}/check-participant?userId=${user.id}`
-			);
-			const data = await response.json();
+		const isParticipant = participants.some((p) => p.userId === user.id);
 
-			if (!data.isParticipant) {
-				toast.error("You are not a member of this lobby");
-				router.replace("/lobby");
-				return false;
-			}
-
-			joinRoom(id, truncateAddress(user.stxAddress), user?.id);
-			return true;
-		} catch (error) {
-			console.error("Error checking participant:", error);
-			toast.error("Failed to verify lobby membership");
+		if (!isParticipant) {
+			toast.error("You are not a member of this lobby");
 			router.replace("/lobby");
 			return false;
 		}
-	}, [user, id, joinRoom, router]);
+
+		joinRoom(id, truncateAddress(user.stxAddress), user?.id);
+		return true;
+	}, [user, id, joinRoom, router, participants]);
 
 	useEffect(() => {
 		if (socket && user?.id && !hasJoinedRef.current) {
