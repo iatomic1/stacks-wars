@@ -36,7 +36,7 @@ interface GameOverModalProps {
 	onClose: () => void;
 	score: number;
 	onPlayAgain: () => void;
-	onBackToMenu?: () => void;
+	onBackToLobby: () => void;
 	playerScores?: PlayerScore[];
 	user: UserType;
 }
@@ -46,7 +46,7 @@ export default function GameOverModal({
 	onClose,
 	score,
 	onPlayAgain,
-	onBackToMenu,
+	onBackToLobby,
 	playerScores = [],
 	user,
 }: GameOverModalProps) {
@@ -285,23 +285,21 @@ export default function GameOverModal({
 						<ArrowRight className="h-5 w-5 ml-2" />
 					</Button>
 
-					{onBackToMenu && (
-						<Button
-							onClick={() => {
-								onClose();
-								onBackToMenu();
-							}}
-							variant="outline"
-							className={cn(
-								"w-full sm:w-auto text-base py-6 transition-all duration-500 delay-600 scale-95 opacity-0",
-								animate && "scale-100 opacity-100"
-							)}
-							size="lg"
-						>
-							Back to Menu
-							<Home className="h-5 w-5 ml-2" />
-						</Button>
-					)}
+					<Button
+						onClick={() => {
+							onClose();
+							onBackToLobby();
+						}}
+						variant="outline"
+						className={cn(
+							"w-full sm:w-auto text-base py-6 transition-all duration-500 delay-600 scale-95 opacity-0",
+							animate && "scale-100 opacity-100"
+						)}
+						size="lg"
+					>
+						Back to lobby
+						<Home className="h-5 w-5 ml-2" />
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
